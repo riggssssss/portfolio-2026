@@ -1,0 +1,620 @@
+/* GT Walsheim TRIAL — solo pruebas en local. Comprar licencia Web antes de publicar. */
+@font-face {
+  font-family: 'GT Walsheim';
+  src: url('./fonts/GT-Walsheim-Regular-Trial.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GT Walsheim';
+  src: url('./fonts/GT-Walsheim-Medium-Trial.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root {
+  /* The two global tones: --bg is the site's white, --ink its (soft) black. */
+  --bg: #ececea;
+  --ink: #262624;
+  --muted: #5f5f5c;
+  --tile: #dcdcd9;
+  --rule: #d2d2cf;
+  --accent: #d5ff2e; /* used almost nowhere: bio marks, menu hover, text selection */
+  --gutter: clamp(16px, 1.6vw, 28px);
+  --gap: clamp(10px, 1.1vw, 18px);
+  --card-gap: clamp(4px, 0.4vw, 8px);
+  --bar-h: 64px;
+  /* The back arrow's own row, above both project columns. */
+  --back-h: clamp(44px, 6svh, 64px);
+  --title: clamp(2rem, 3.4vw, 3.75rem);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.76, 0, 0.24, 1);
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'GT Walsheim', 'Schibsted Grotesk Variable', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--ink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+svg {
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+
+/* ---------- header: shared by every view ---------- */
+
+.bar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 3;
+  padding: var(--gutter);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+  align-items: baseline;
+  pointer-events: none;
+}
+
+/* Menu voice, a whisper next to the name. */
+.by {
+  font-family: 'GT Walsheim', 'Schibsted Grotesk Variable', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: -0.005em;
+}
+
+.role,
+.clock {
+  color: var(--muted);
+}
+
+.by {
+  color: color-mix(in srgb, var(--muted) 55%, var(--bg));
+}
+
+.role {
+  grid-column: 1 / span 2;
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+.role {
+  transition: opacity 0.5s var(--ease-out), visibility 0.5s;
+}
+
+.is-project .role {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.clock {
+  grid-column: 4;
+  justify-self: end;
+}
+
+.nav {
+  grid-column: 3;
+  display: flex;
+  gap: 1.2em;
+}
+
+.nav a {
+  position: relative;
+  isolation: isolate;
+}
+
+.nav a::after,
+.link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .nav a:hover::after,
+  .link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* The current page keeps the marker drawn. */
+.nav a[aria-current='page']::after {
+  transform: scaleX(1);
+}
+
+/* Hover paints the same lime marker. */
+.nav a::after {
+  z-index: -1;
+  bottom: 0.05em;
+  height: 0.5em;
+  background: var(--accent);
+}
+
+/* The header box is tall; only its contents take clicks. */
+.bar > * {
+  pointer-events: auto;
+}
+
+/* ---------- home ---------- */
+
+.page {
+  height: 100svh;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  touch-action: none;
+  user-select: none;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--gap);
+  padding: var(--gutter);
+  padding-bottom: clamp(16px, 3vh, 36px);
+  min-height: 0;
+}
+
+mark {
+  color: inherit;
+  background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 92%, transparent 92%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.signature {
+  /* A serif carries more ink than the grotesk; ease it back toward the ground. */
+  color: color-mix(in srgb, var(--ink) 91%, var(--bg));
+}
+
+/* Bottom right: the lime counterweight to the bio's marks. */
+.now {
+  flex: none;
+  color: var(--muted);
+}
+
+.now a {
+  color: var(--ink);
+}
+
+/* Hover fills the marker: it reads as a link without an underline. */
+@media (hover: hover) {
+  .now a:hover mark {
+    background: var(--accent);
+  }
+}
+
+.hero,
+.now {
+  transition: opacity 0.5s var(--ease-out);
+}
+
+.is-away .hero,
+.is-away .now {
+  opacity: 0;
+}
+
+.hero {
+  /* Lora for the signature line only — the one serif on the page. */
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(1.5rem, 2.4vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.pr-title,
+.pr-next-title {
+  /* Same serif and ink as the landing signature. */
+  font-family: 'Lora', Georgia, serif;
+  font-size: var(--title);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: color-mix(in srgb, var(--ink) 91%, var(--bg));
+  padding-bottom: 0.06em;
+}
+
+/* ---------- carousel ---------- */
+
+.work {
+  position: relative;
+  min-height: 0;
+  padding-bottom: var(--gutter);
+  overflow: hidden;
+}
+
+.track {
+  /* Headroom so a hovered card can grow without clipping. */
+  --card-h: calc((50svh - var(--gutter) - 28px) / 1.1);
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--card-gap);
+  padding-left: var(--gutter);
+  cursor: grab;
+}
+
+.track.is-dragging {
+  cursor: grabbing;
+}
+
+.card {
+  flex: none;
+  width: calc(var(--card-h) * 0.78 + 20px);
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  /* Grows upward into the empty half, never into the bottom edge. */
+  transform-origin: 50% 100%;
+  /* `translate` is free for the view change; the scroll engine owns `transform`. */
+  transition: translate 0.95s var(--ease-io) var(--delay, 0s);
+}
+
+.cards-out .card:not(.is-lifted) {
+  translate: calc(var(--dir, 0) * 6vw) 115%;
+}
+
+.card.is-lifted .card-media {
+  visibility: hidden;
+}
+
+/* Its caption is flying as the page title. */
+.card.is-lifted .card-caption {
+  visibility: hidden;
+}
+
+.card-media,
+.pm,
+.pr-next-thumb {
+  position: relative;
+  overflow: hidden;
+  background: var(--tile);
+}
+
+.card-media {
+  height: var(--card-h);
+}
+
+.card-media > *,
+.pm > *,
+.pr-next-thumb > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-media > * {
+  will-change: transform;
+}
+
+/* Same size and voice as the menu. */
+.card-caption {
+  padding-top: 8px;
+}
+
+/* ---------- project ---------- */
+
+.proj {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.pm {
+  position: fixed;
+  top: calc(var(--bar-h) + var(--back-h));
+  left: var(--gutter);
+  width: calc(50vw - var(--gutter) * 1.5);
+  height: calc(100svh - var(--bar-h) - var(--back-h) - var(--gutter));
+  z-index: 1;
+}
+
+.pm-ghost {
+  z-index: 0;
+}
+
+.pr {
+  position: fixed;
+  top: calc(var(--bar-h) + var(--back-h));
+  bottom: 0;
+  left: calc(50vw + var(--gutter) * 0.5);
+  right: 0;
+  z-index: 2;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+
+.pr-inner {
+  padding: 0 var(--gutter) var(--gutter) 0;
+}
+
+.pr-sheet {
+  display: flex;
+  flex-direction: column;
+}
+
+.pr-title-flying {
+  position: fixed;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.back {
+  position: fixed;
+  top: var(--bar-h);
+  left: var(--gutter);
+  z-index: 3;
+  height: var(--back-h);
+  display: flex;
+  align-items: center;
+  /* Optically flush with the media edge below. */
+  margin-left: -0.08em;
+  font-size: clamp(28px, 2.4vw, 40px);
+  pointer-events: auto;
+}
+
+.back svg {
+  transition: transform 0.5s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .back:hover svg {
+    transform: translateX(-5px);
+  }
+}
+
+.pr-tags {
+  margin-top: 0.7em;
+  color: var(--muted);
+}
+
+.pr-lead {
+  margin-top: clamp(32px, 6svh, 64px);
+  font-size: clamp(1.25rem, 1.75vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  max-width: 32ch;
+  text-wrap: pretty;
+}
+
+.pr-facts {
+  margin-top: clamp(40px, 8svh, 88px);
+  border-top: 1px solid var(--rule);
+}
+
+.pr-facts > div {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--gap);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.pr-facts dt {
+  color: var(--muted);
+}
+
+.pr-facts dd {
+  margin: 0;
+}
+
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.pr-block {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--gap);
+  margin-top: clamp(48px, 10svh, 112px);
+}
+
+.pr-block h2 {
+  font-size: inherit;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.pr-block p {
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 58ch;
+  text-wrap: pretty;
+}
+
+.pr-next {
+  margin-top: clamp(80px, 18svh, 200px);
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  display: block;
+  width: 100%;
+}
+
+.pr-next-label {
+  color: var(--muted);
+}
+
+.pr-next-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--gap);
+  margin-top: 14px;
+}
+
+.pr-next-thumb {
+  flex: none;
+  width: clamp(96px, 11vw, 168px);
+  aspect-ratio: 4 / 5;
+}
+
+.pr-next-thumb > * {
+  transition: transform 0.9s var(--ease-out);
+}
+
+.pr-next-title {
+  padding-bottom: 0;
+}
+
+@media (hover: hover) {
+  .pr-next:hover .pr-next-thumb > * {
+    transform: scale(1.06);
+  }
+}
+
+/* Text enters after the media has landed; leaves before it flies back. */
+.proj.is-in .rv {
+  animation: rv-in 0.9s var(--ease-out) both;
+  animation-delay: calc(var(--base) + var(--i) * 55ms);
+}
+
+.proj.is-out .rv {
+  animation: rv-out 0.35s var(--ease-out) both;
+}
+
+@keyframes rv-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+}
+
+@keyframes rv-out {
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 760px) {
+  /* Bio, then the menu on its own line. Inside a project only the menu stays. */
+  .bar {
+    grid-template-columns: 1fr;
+    row-gap: 12px;
+  }
+  .role {
+    grid-column: 1;
+  }
+  .is-project .role {
+    display: none;
+  }
+  .nav {
+    grid-column: 1;
+    gap: 0.9em;
+  }
+  .hero {
+    font-size: 2rem;
+    white-space: nowrap;
+  }
+  .now {
+    flex: 0 1 auto;
+    text-align: right;
+  }
+  .clock {
+    display: none;
+  }
+  .card {
+    width: calc(var(--card-h) * 0.72 + 20px);
+  }
+
+  /* Media pinned on top, the text sheet scrolls up over it. */
+  .pm {
+    width: calc(100vw - var(--gutter) * 2);
+    height: 46svh;
+  }
+  .pr {
+    left: 0;
+  }
+  .pr-inner {
+    padding: calc(46svh + 12px) 0 0;
+  }
+  :root {
+    --back-h: 44px;
+  }
+  .pr-sheet {
+    background: var(--bg);
+    padding: 14px var(--gutter) calc(var(--gutter) + env(safe-area-inset-bottom));
+    min-height: calc(100svh - var(--bar-h) - var(--back-h));
+  }
+  .pr-block {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proj.is-in .rv,
+  .proj.is-out .rv {
+    animation-duration: 1ms;
+    animation-delay: 0s;
+  }
+  .card {
+    transition-duration: 1ms;
+  }
+}

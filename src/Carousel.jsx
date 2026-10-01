@@ -1,0 +1,272 @@
+import { useEffect, useRef, useState } from 'react'
+
+// Feel. Lower LERP = more glide.
+const LERP = 0.07
+const WHEEL = 1.15
+const DRAG = 1.4
+const THROW = 220 // ms of release velocity carried forward
+const SCALE_DROP = 0.18 // max shrink at full speed
+const SPREAD = 0.2 // how far cards drift from the center at full speed
+const SPEED_MAX = 38 // px/frame that counts as full speed
+const GROW = 0.1 // hovered card grows this much; its neighbours make room
+
+const wrap = (min, max, v) => {
+  const r = max - min
+  return ((((v - min) % r) + r) % r) + min
+}
+
+export default function Carousel({ items, onOpen, locked }) {
+  const trackRef = useRef(null)
+  const lockedRef = useRef(locked)
+  lockedRef.current = locked
+  const [repeat, setRepeat] = useState(2)
+
+  // Enough copies that the loop never shows its seam.
+  useEffect(() => {
+    const fit = () => {
+      const card = trackRef.current?.firstElementChild
+      if (!card) return
+      const step = card.offsetWidth * 1.1
+      setRepeat(Math.max(2, Math.ceil((innerWidth + step * 3) / (items.length * step))))
+    }
+    fit()
+    addEventListener('resize', fit)
+    return () => removeEventListener('resize', fit)
+  }, [items.length])
+
+  useEffect(() => {
+    const track = trackRef.current
+    const cards = [...track.children]
+    const media = cards.map((c) => c.querySelector('.card-media').firstElementChild)
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Mouse: hover drives the card. Touch: the centered card does.
+    const byHover = matchMedia('(hover: hover)').matches
+
+    let step, cardW, total, vw, lefts
+    const measure = () => {
+      lefts = cards.map((c) => c.offsetLeft)
+      step = lefts[1] - lefts[0]
+      cardW = cards[0].offsetWidth
+      total = step * cards.length
+      vw = innerWidth
+    }
+    measure()
+
+    let current = 0
+    let target = current
+    let intensity = 0
+    let dirty = true
+    let hovered = -1 // index into `cards`
+    const grow = cards.map(() => 0)
+    const videos = cards.map((c) => c.querySelector('video'))
+    let playing = null
+
+    // Only one card plays: the hovered one (mouse) or the centered one (touch).
+    const play = (i) => {
+      const v = videos[i] ?? null
+      if (v === playing) return
+      playing?.pause()
+      playing = v
+      v?.play().catch(() => {})
+    }
+
+    // Wheel: vertical or horizontal deltas both drive the strip.
+    const onWheel = (e) => {
+      if (lockedRef.current) return
+      e.preventDefault()
+      let d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+      if (e.deltaMode === 1) d *= 16
+      target += d * WHEEL
+    }
+
+    // Drag with throw.
+    let down = false, lastX = 0, lastT = 0, vel = 0, moved = 0
+    const onDown = (e) => {
+      if (e.button !== 0 || lockedRef.current) return
+      down = true
+      moved = 0
+      vel = 0
+      lastX = e.clientX
+      lastT = performance.now()
+      track.classList.add('is-dragging')
+    }
+    const onMove = (e) => {
+      if (!down) return
+      const now = performance.now()
+      const dx = e.clientX - lastX
+      moved += Math.abs(dx)
+      vel = vel * 0.6 + (dx / Math.max(now - lastT, 1)) * 0.4
+      target -= dx * DRAG
+      lastX = e.clientX
+      lastT = now
+    }
+    const onUp = () => {
+      if (!down) return
+      down = false
+      track.classList.remove('is-dragging')
+      if (performance.now() - lastT < 80) target -= vel * THROW * DRAG
+    }
+    // A drag is not a click; a click opens the project in place.
+    const onClick = (e) => {
+      const card = e.target.closest('.card')
+      if (!card || e.metaKey || e.ctrlKey) return
+      e.preventDefault()
+      if (moved > 6 || lockedRef.current) return
+      onOpen?.(+card.dataset.i)
+    }
+
+    const onOver = (e) => {
+      if (!byHover || down || lockedRef.current) return
+      const card = e.target.closest('.card')
+      if (!card) return
+      hovered = cards.indexOf(card)
+      play(hovered)
+    }
+    const onLeave = () => {
+      if (!byHover || lockedRef.current) return
+      hovered = -1
+      play(-1)
+    }
+
+    const onKey = (e) => {
+      if (lockedRef.current) return
+      if (e.key === 'ArrowRight') target += step
+      else if (e.key === 'ArrowLeft') target -= step
+    }
+
+    // Keyboard focus brings the card to the center.
+    const onFocus = (e) => {
+      const card = e.target.closest('.card')
+      const i = cards.indexOf(card)
+      if (i < 0) return
+      const p = wrap(-step, total - step, lefts[i] - current)
+      target = current + (p + cardW / 2 - vw / 2)
+    }
+
+    const onResize = () => {
+      measure()
+      dirty = true
+    }
+
+    addEventListener('wheel', onWheel, { passive: false })
+    track.addEventListener('pointerdown', onDown)
+    addEventListener('pointermove', onMove)
+    addEventListener('pointerup', onUp)
+    addEventListener('pointercancel', onUp)
+    track.addEventListener('click', onClick)
+    track.addEventListener('pointerover', onOver)
+    track.addEventListener('pointerleave', onLeave)
+    track.addEventListener('focusin', onFocus)
+    addEventListener('keydown', onKey)
+    addEventListener('resize', onResize)
+
+    let raf
+    let last = performance.now()
+    const tick = (now) => {
+      raf = requestAnimationFrame(tick)
+      const dt = Math.min((now - last) / 16.667, 4)
+      last = now
+
+      const prev = current
+      current += (target - current) * (1 - Math.pow(1 - (reduce ? 0.25 : LERP), dt))
+      const speed = Math.abs(current - prev) / dt
+      const want = reduce ? 0 : Math.min(speed / SPEED_MAX, 1)
+      intensity += (want - intensity) * (1 - Math.pow(1 - 0.09, dt))
+
+      let growing = false
+      const kg = 1 - Math.pow(1 - 0.1, dt)
+      for (let i = 0; i < cards.length; i++) {
+        const want = i === hovered && !down && !lockedRef.current ? 1 : 0
+        grow[i] += (want - grow[i]) * kg
+        if (Math.abs(want - grow[i]) > 0.001) growing = true
+      }
+
+      if (!dirty && !growing && Math.abs(target - current) < 0.05 && intensity < 0.0005) return
+      dirty = false
+
+      const e = 1 - Math.pow(1 - intensity, 2) // ease-out: responds fast, settles soft
+      const scale = 1 - SCALE_DROP * e
+      let nearest = 0, best = Infinity
+
+      const ps = cards.map((_, i) => wrap(-step, total - step, lefts[i] - current))
+      for (let i = 0; i < cards.length; i++) {
+        const p = ps[i]
+        const fromCenter = p + cardW / 2 - vw / 2
+        // Every growing card pushes the others away by half its extra width.
+        let push = 0
+        for (let j = 0; j < cards.length; j++) {
+          if (j !== i && grow[j] > 0.001) push += Math.sign(p - ps[j]) * (cardW * GROW * grow[j]) / 2
+        }
+        const x = p - lefts[i] + fromCenter * SPREAD * e + push
+        cards[i].style.transform = `translate3d(${x}px,0,0) scale(${scale * (1 + GROW * grow[i])})`
+        if (media[i]) media[i].style.transform = `translate3d(${(fromCenter / vw) * -6}%,0,0) scale(1.14)`
+        const d = Math.abs(fromCenter)
+        if (d < best) (best = d), (nearest = i)
+      }
+
+      if (!byHover) play(nearest)
+    }
+    raf = requestAnimationFrame(tick)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      playing?.pause()
+      removeEventListener('wheel', onWheel)
+      track.removeEventListener('pointerdown', onDown)
+      removeEventListener('pointermove', onMove)
+      removeEventListener('pointerup', onUp)
+      removeEventListener('pointercancel', onUp)
+      track.removeEventListener('click', onClick)
+      track.removeEventListener('pointerover', onOver)
+      track.removeEventListener('pointerleave', onLeave)
+      track.removeEventListener('focusin', onFocus)
+      removeEventListener('keydown', onKey)
+      removeEventListener('resize', onResize)
+    }
+  }, [items, repeat, onOpen])
+
+  const list = Array.from({ length: repeat }, () => items).flat()
+
+  return (
+    <div className="track" ref={trackRef}>
+      {list.map((p, i) => {
+        const clone = i >= items.length
+        return (
+          <a
+            key={i}
+            className="card"
+            data-i={i % items.length}
+            href={`/proyecto/${p.slug}`}
+            draggable={false}
+            aria-hidden={clone || undefined}
+            tabIndex={clone ? -1 : undefined}
+          >
+            <div className="card-media">
+              <Media p={p} decorative={clone} eager={i < 8} play={false} />
+            </div>
+            <div className="card-caption">
+              <span>{p.title}</span>
+            </div>
+          </a>
+        )
+      })}
+    </div>
+  )
+}
+
+export function Media({ p, decorative, eager = true, play = true }) {
+  return p.video ? (
+    <video
+      src={p.video}
+      poster={p.image}
+      muted
+      loop
+      playsInline
+      autoPlay={play}
+      preload="metadata"
+      aria-label={decorative ? undefined : p.title}
+    />
+  ) : (
+    <img src={p.image} alt={decorative ? '' : p.title} draggable={false} loading={eager ? 'eager' : 'lazy'} />
+  )
+}

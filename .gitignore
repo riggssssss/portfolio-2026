@@ -1,0 +1,6 @@
+node_modules
+dist
+# GT Walsheim Trial: licencia no permite subirla a repos públicos
+src/fonts/
+.impeccable/review/
+.DS_Store
