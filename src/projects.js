@@ -92,7 +92,7 @@ export const site = {
   email: 'hello.adrian.gar@gmail.com',
   nav: [
     { label: 'Work', href: '/' },
-    { label: 'About', href: '#about' },
+    { label: 'About', href: '/about' },
     { label: 'Contact', href: 'mailto:hello.adrian.gar@gmail.com' },
   ],
 }

@@ -8,15 +8,22 @@ const THROW = 220 // ms of release velocity carried forward
 const SCALE_DROP = 0.18 // max shrink at full speed
 const SPREAD = 0.2 // how far cards drift from the center at full speed
 const SPEED_MAX = 38 // px/frame that counts as full speed
-const GROW = 0.1 // hovered card grows this much; its neighbours make room
+const GROW = 0.1 // hovered card grows up to this much (capped by the headroom); its neighbours make room
 
 const wrap = (min, max, v) => {
   const r = max - min
   return ((((v - min) % r) + r) % r) + min
 }
 
-export default function Carousel({ items, onOpen, locked }) {
+// The landing intro: the strip arrives from the left this many viewports away
+// and glides in on its own inertia, shrinking and spreading like any fast scroll.
+const INTRO = 1.3
+const INTRO_LERP = 0.032 // calmer glide for the intro only
+
+export default function Carousel({ items, onOpen, locked, intro }) {
   const trackRef = useRef(null)
+  // Position outlives the engine, which restarts when the copy count changes.
+  const posRef = useRef(null)
   const lockedRef = useRef(locked)
   lockedRef.current = locked
   const [repeat, setRepeat] = useState(2)
@@ -42,8 +49,10 @@ export default function Carousel({ items, onOpen, locked }) {
     // Mouse: hover drives the card. Touch: the centered card does.
     const byHover = matchMedia('(hover: hover)').matches
 
-    let step, cardW, total, vw, lefts
+    let step, cardW, total, vw, lefts, growMax
     const measure = () => {
+      // Growth fills the headroom above the cards and never reaches the name.
+      growMax = Math.min(GROW, (track.clientHeight - cards[0].offsetHeight - 6) / cards[0].offsetHeight)
       lefts = cards.map((c) => c.offsetLeft)
       step = lefts[1] - lefts[0]
       cardW = cards[0].offsetWidth
@@ -52,8 +61,14 @@ export default function Carousel({ items, onOpen, locked }) {
     }
     measure()
 
-    let current = 0
-    let target = current
+    if (!posRef.current) {
+      const start = intro && !reduce ? innerWidth * INTRO : 0 // moving left → right
+      posRef.current = { current: start, target: 0 }
+    }
+    let current = posRef.current.current
+    let target = posRef.current.target
+    // Until the intro glide settles (or the visitor takes over), it eases slower.
+    let gliding = current !== target
     let intensity = 0
     let dirty = true
     let hovered = -1 // index into `cards`
@@ -175,7 +190,11 @@ export default function Carousel({ items, onOpen, locked }) {
       last = now
 
       const prev = current
-      current += (target - current) * (1 - Math.pow(1 - (reduce ? 0.25 : LERP), dt))
+      if (gliding && (Math.abs(target - posRef.current.target) > 0 || Math.abs(target - current) < 1)) gliding = false
+      const lerp = reduce ? 0.25 : gliding ? INTRO_LERP : LERP
+      current += (target - current) * (1 - Math.pow(1 - lerp, dt))
+      posRef.current.current = current
+      posRef.current.target = target
       const speed = Math.abs(current - prev) / dt
       const want = reduce ? 0 : Math.min(speed / SPEED_MAX, 1)
       intensity += (want - intensity) * (1 - Math.pow(1 - 0.09, dt))
@@ -202,10 +221,10 @@ export default function Carousel({ items, onOpen, locked }) {
         // Every growing card pushes the others away by half its extra width.
         let push = 0
         for (let j = 0; j < cards.length; j++) {
-          if (j !== i && grow[j] > 0.001) push += Math.sign(p - ps[j]) * (cardW * GROW * grow[j]) / 2
+          if (j !== i && grow[j] > 0.001) push += Math.sign(p - ps[j]) * (cardW * growMax * grow[j]) / 2
         }
         const x = p - lefts[i] + fromCenter * SPREAD * e + push
-        cards[i].style.transform = `translate3d(${x}px,0,0) scale(${scale * (1 + GROW * grow[i])})`
+        cards[i].style.transform = `translate3d(${x}px,0,0) scale(${scale * (1 + growMax * grow[i])})`
         if (media[i]) media[i].style.transform = `translate3d(${(fromCenter / vw) * -6}%,0,0) scale(1.14)`
         const d = Math.abs(fromCenter)
         if (d < best) (best = d), (nearest = i)
@@ -248,11 +267,14 @@ export default function Carousel({ items, onOpen, locked }) {
             aria-hidden={clone || undefined}
             tabIndex={clone ? -1 : undefined}
           >
-            <div className="card-media">
-              <Media p={p} decorative={clone} eager={i < 8} play={false} />
-            </div>
-            <div className="card-caption">
-              <span>{p.title}</span>
+            {/* What hangs and falls on the way to About (hang.js); the engine owns the card. */}
+            <div className="card-hang">
+              <div className="card-media">
+                <Media p={p} decorative={clone} eager={i < 8} play={false} />
+              </div>
+              <div className="card-caption">
+                <span>{p.title}</span>
+              </div>
             </div>
           </a>
         )

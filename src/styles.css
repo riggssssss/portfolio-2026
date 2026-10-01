@@ -1,18 +1,4 @@
-/* GT Walsheim TRIAL — solo pruebas en local. Comprar licencia Web antes de publicar. */
-@font-face {
-  font-family: 'GT Walsheim';
-  src: url('./fonts/GT-Walsheim-Regular-Trial.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'GT Walsheim';
-  src: url('./fonts/GT-Walsheim-Medium-Trial.woff2') format('woff2');
-  font-weight: 500;
-  font-display: swap;
-}
-
+/* Figtree (variable, @fontsource) for everything; Lora for the signature line. */
 :root {
   /* --bg is the site's white. Three inks, equal steps of lightness (OKLCH L
      .27 / .45 / .63), same warm-neutral hue:
@@ -56,7 +42,7 @@ body {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: 'GT Walsheim', 'Schibsted Grotesk Variable', system-ui, sans-serif;
+  font-family: 'Figtree Variable', system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.35;
   letter-spacing: -0.005em;
@@ -111,7 +97,7 @@ svg {
 
 /* Menu voice, a whisper next to the name. */
 .by {
-  font-family: 'GT Walsheim', 'Schibsted Grotesk Variable', system-ui, sans-serif;
+  font-family: 'Figtree Variable', system-ui, sans-serif;
   font-weight: 400;
   font-size: 15px;
   letter-spacing: -0.005em;
@@ -133,11 +119,13 @@ svg {
   text-wrap: pretty;
 }
 
-.role {
+.role,
+.clock {
   animation: fade-in 0.6s var(--ease-out) both;
 }
 
-.role.is-leaving {
+.role.is-leaving,
+.clock.is-leaving {
   animation: fade-out 0.35s var(--ease-out) both;
 }
 
@@ -213,11 +201,13 @@ svg {
 .top {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  /* Name and "Now building" share a baseline… */
+  align-items: last baseline;
   gap: var(--gap);
   padding: var(--gutter);
-  /* Close to the strip: the name reads as the caption of the work. */
-  padding-bottom: 6px;
+  /* The strip's own headroom is the gap under the name: one gutter, the same
+     as the page's edges. */
+  padding-bottom: 0;
   min-height: 0;
 }
 
@@ -260,6 +250,9 @@ mark {
 }
 
 .hero {
+  /* …and that baseline sits on the strip's edge: Lora keeps ~0.13em under it,
+     which would make the gap read a gutter and a bit. */
+  margin-bottom: -0.2em;
   /* Lora for the signature line only — the one serif on the page. */
   font-family: 'Lora', Georgia, serif;
   font-size: clamp(1.5rem, 2.4vw, 2.5rem);
@@ -290,8 +283,9 @@ mark {
 }
 
 .track {
-  /* Headroom so a hovered card can grow without clipping. */
-  --card-h: calc((var(--work-h) - var(--gutter) - 28px) / 1.1);
+  /* One gutter of headroom above the cards (the gap under the name); a hovered
+     card grows into it and no further (Carousel). */
+  --card-h: calc(var(--work-h) - var(--gutter) * 2 - 28px);
   height: 100%;
   display: flex;
   align-items: flex-end;
@@ -321,6 +315,18 @@ mark {
 }
 
 .card.is-lifted .card-media {
+  visibility: hidden;
+}
+
+/* Poses for the way to About are written here by hang.js (translate, rotate). */
+.card-hang {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Settled on About: nothing of the home may show, whatever re-lays it out. */
+.page.is-hung .top,
+.page.is-hung .work {
   visibility: hidden;
 }
 
@@ -387,17 +393,21 @@ mark {
   z-index: 1;
 }
 
-/* Next project: falls over this one inside the media frame. */
-.pm-curtain {
+/* Media layers: project to project the next one curtains in over the last. */
+.pm .pm-layer {
   position: absolute;
   inset: 0;
-  clip-path: inset(0 0 100% 0);
 }
 
-.pm-curtain > * {
+.pm-layer > * {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+}
+
+/* Swapping text keeps its own box, so it can rise and fall on its own. */
+[data-swap] {
   display: block;
 }
 
@@ -424,10 +434,6 @@ mark {
   flex-direction: column;
 }
 
-/* Leaving for the next project: once the curtain is down the text fades. */
-.proj.is-leaving .pr-sheet > * {
-  animation: fade-out 0.28s var(--ease-out) both;
-}
 
 .pr-intro {
   /* Title, tags, lead and facts fill the first screen, sitting on the media's
@@ -653,6 +659,285 @@ mark {
   }
 }
 
+/* ---------- about ---------- */
+
+/* Every line reads --ap (0 home → 1 about, set by hang.js) and comes in at its
+   own --at, so the page arrives and leaves on the same curve, at any point. */
+.ar {
+  --k: clamp(0, (var(--ap, 0) - var(--at, 0.5)) / 0.25, 1);
+  opacity: var(--k);
+  translate: 0 calc((1 - var(--k)) * (1 - var(--k)) * 36px);
+  /* Comes into focus as it settles. */
+  filter: blur(calc((1 - var(--k)) * (1 - var(--k)) * 8px));
+}
+
+.ab {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ab-scroll {
+  position: absolute;
+  inset: var(--bar-h) 0 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--gutter) var(--gutter);
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+
+.ab.is-on .ab-scroll {
+  pointer-events: auto;
+}
+
+/* First screen: the statement sits low, where the work was. */
+.ab-intro {
+  min-height: calc(100svh - var(--bar-h) - var(--gutter));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.ab-intro h1 {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(2.25rem, 5vw, 5.75rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  max-width: 17ch;
+  text-wrap: balance;
+  padding-bottom: 0.06em;
+}
+
+/* Same four columns as the bar: the lead under the bio's place, the facts
+   under the menu. */
+.ab-row,
+.ab-block,
+.ab-close {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+}
+
+.ab-row {
+  margin-top: clamp(40px, 9svh, 104px);
+  align-items: end;
+}
+
+.ab-lead {
+  grid-column: 1 / span 2;
+  font-size: clamp(1.25rem, 1.75vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  max-width: 30ch;
+  text-wrap: pretty;
+  color: var(--ink-2);
+}
+
+.ab-facts {
+  grid-column: 3 / span 2;
+  border-top: 1px solid var(--rule);
+}
+
+.ab-facts > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.ab-facts dt,
+.ab-block h2,
+.ab-dates,
+.ab-close-label {
+  color: var(--ink-3);
+}
+
+.ab-facts dd {
+  margin: 0;
+}
+
+.ab-block {
+  margin-top: clamp(72px, 16svh, 176px);
+}
+
+/* The section's name rides along while its entries pass. */
+.ab-block h2 {
+  grid-column: 1;
+  align-self: start;
+  position: sticky;
+  top: 10px;
+  font-size: inherit;
+  font-weight: 400;
+}
+
+.ab-list {
+  grid-column: 2 / span 3;
+}
+
+/* The rule belongs to the entry, so it comes and goes with it. */
+.ab-entry:first-child {
+  border-top: 1px solid var(--rule);
+}
+
+.ab-entry {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--gap);
+  padding: 10px 0 clamp(20px, 3.4svh, 36px);
+  border-bottom: 1px solid var(--rule);
+}
+
+.ab-body {
+  max-width: 62ch;
+}
+
+.ab-body h3 {
+  font-size: clamp(1.25rem, 1.75vw, 1.75rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.ab-body h3 span {
+  display: block;
+  font-size: 15px;
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+  margin-top: 0.35em;
+  color: var(--ink-2);
+}
+
+.ab-note {
+  margin-top: 0.35em;
+  color: var(--ink-2);
+}
+
+/* Under its label, in the left half: a cloud, not a row of columns. */
+.ab-pills {
+  grid-column: 1 / span 2;
+  max-width: 34rem;
+  margin-top: 4px;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ab-pills li {
+  padding: 0.4em 0.95em 0.45em;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-size: clamp(15px, 1.15vw, 18px);
+  transition: background-color 0.3s var(--ease-out), border-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
+}
+
+/* Same lime as the marks, drawn whole. */
+@media (hover: hover) {
+  .ab-pills li:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+}
+
+/* The page ends on the address, at the size of a title. */
+.ab-close {
+  margin-top: clamp(96px, 22svh, 240px);
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  row-gap: 14px;
+}
+
+.ab-close-label {
+  grid-column: 1 / -1;
+}
+
+.ab-mail {
+  grid-column: 1 / -1;
+  justify-self: start;
+  font-family: 'Lora', Georgia, serif;
+  font-size: min(var(--title), 7.4vw);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+
+/* The marker draws across on hover, like the menu. */
+.ab-mail mark {
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.6s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .ab-mail:hover mark {
+    background-size: 100% 100%;
+  }
+}
+
+/* ---------- landing intro ---------- */
+
+/* The strip glides in first (Carousel); the rest settles after it in loose,
+   uneven sections — name, then what's being built, bio, menu, clock. */
+html.intro .track {
+  animation: fade-in 1.6s ease-out both;
+}
+
+html.intro .card-caption {
+  animation: fade-in 1.4s ease-out 1.5s both;
+}
+
+html.intro .hero {
+  animation: intro-up 1.6s var(--ease-out) 1s both;
+}
+
+html.intro .now {
+  animation: intro-up 1.5s var(--ease-out) 1.4s both;
+}
+
+html.intro .role {
+  animation: intro-up 1.6s var(--ease-out) 1.7s both;
+}
+
+html.intro .bar .nav {
+  animation: intro-up 1.5s var(--ease-out) 2s both;
+}
+
+html.intro .clock {
+  animation: intro-up 1.5s var(--ease-out) 2.25s both;
+}
+
+/* Back home from a project: the cards rise, then the rest settles in, as
+   uneven as the intro but quicker — the visitor has seen it once. */
+html.returning .hero {
+  animation: intro-up 1.3s var(--ease-out) 0.05s both;
+}
+
+html.returning .now {
+  animation: intro-up 1.2s var(--ease-out) 0.22s both;
+}
+
+html.returning .role {
+  animation: intro-up 1.3s var(--ease-out) 0.36s both;
+}
+
+html.returning .clock {
+  animation: intro-up 1.2s var(--ease-out) 0.62s both;
+}
+
+@keyframes intro-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
 /* ---------- small screens ---------- */
 
 @media (max-width: 760px) {
@@ -663,6 +948,14 @@ mark {
   }
   .role {
     grid-column: 1;
+  }
+  /* Leaving, the bio stops taking room at once: the menu row (and with it the
+     edge every project measures from) is already where it will stay. */
+  .role.is-leaving {
+    position: absolute;
+    top: var(--gutter);
+    left: var(--gutter);
+    right: var(--gutter);
   }
   .nav {
     grid-column: 1;
@@ -701,6 +994,10 @@ mark {
   .bar:not(.is-project) .nav {
     animation: nav-in 0.6s var(--ease-out) both;
   }
+  /* Desktop keeps the menu through a project; here it moved, so it re-enters. */
+  html.returning .bar .nav {
+    animation: intro-up 1.2s var(--ease-out) 0.5s both;
+  }
   .is-project .nav {
     justify-self: end;
     /* Its own name, so the animation restarts when the class flips. */
@@ -728,6 +1025,32 @@ mark {
     grid-template-columns: 1fr;
     gap: 8px;
   }
+
+  /* About: one column; labels sit above what they name. */
+  .ab-row,
+  .ab-block,
+  .ab-close,
+  .ab-entry {
+    grid-template-columns: 1fr;
+  }
+  .ab-lead,
+  .ab-facts,
+  .ab-list,
+  .ab-pills {
+    grid-column: 1;
+  }
+  .ab-entry {
+    gap: 6px;
+  }
+  .ab-block h2 {
+    position: static;
+  }
+  .ab-row {
+    gap: 36px;
+  }
+  .ab-scroll {
+    padding-bottom: calc(var(--gutter) + env(safe-area-inset-bottom));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -739,7 +1062,8 @@ mark {
   .card {
     transition-duration: 1ms;
   }
-  .nav {
+  .nav,
+  html.intro * {
     animation-duration: 1ms !important;
     animation-delay: 0s !important;
   }

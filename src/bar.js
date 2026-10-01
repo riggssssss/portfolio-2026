@@ -6,7 +6,7 @@ export function syncBarHeight() {
   // edge must not move with it. The bar is fixed at the top, so offsets are y.
   const bar = document.querySelector('.bar')
   const nav = bar.querySelector('.nav')
-  const rows = [nav, bar.querySelector('.clock')]
+  const rows = [nav, bar.querySelector('.clock')].filter(Boolean) // no clock inside a project
   const bottom = Math.max(...rows.map((el) => el.offsetTop + el.offsetHeight))
   const root = document.documentElement.style
   root.setProperty('--nav-mid', `${nav.offsetTop + nav.offsetHeight / 2}px`)
