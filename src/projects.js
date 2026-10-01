@@ -1,25 +1,31 @@
+// *palabras* en sections[].text = marcador lima.
 // Imágenes en /public/projects/ (vertical, ~4:5). `video` opcional (usa `image` como poster).
 export const projects = [
   {
     slug: 'beside',
     title: 'Beside',
     year: 2026, // confirmar
-    tags: 'Mac App · Product Design · AI',
+    status: 'MVP', // confirmar
+    tags: 'macOS App · Product Design · AI',
     image: '/projects/beside-poster.jpg',
     video: '/projects/beside.mp4',
-    url: 'https://beside.app',
-    role: 'Product design, front-end', // confirmar
-    tools: ['Swift', 'SwiftUI', 'Claude API', 'Supabase', 'Figma'],
+    // Sin dominio todavía: la fila Web no sale.
+    role: 'Product design, development',
+    tools: ['Swift', 'SwiftUI', 'Claude API', 'Supabase', 'Figma'], // confirmar
     intro:
-      'A Mac app that keeps the files, notes and links of what you are working on at the edge of your screen — always at hand, never in the way.',
+      'A macOS app that keeps everything you are working on organised in modes — with an AI that knows each one inside out.',
     sections: [
       {
-        heading: 'The desktop is wide. The work is not.',
-        text: 'The sides of a Mac screen sit empty. Beside puts your project there — files, notes and links at hand, and an assistant that knows them all.',
+        heading: 'One mode for each thing',
+        text: 'A personal project, a round of *sending out CVs* with the files you need at hand, a *subject you are studying*. Each lives in its own mode, so every one stays organised *independently* of the rest.',
       },
       {
-        heading: 'Built around the project',
-        text: "A designer with a client's work in flight has it all a glance away: the brief, the assets, the last version, the things still to answer. Designed and built from the idea to the App Store — the interface, the panel, the AI with the project's context in hand, and the site that sells it.",
+        heading: 'An AI with the whole context',
+        text: 'The assistant knows *everything inside the mode* you are in, so it can *answer, create, edit or delete* content for you — without you explaining it all again.',
+      },
+      {
+        heading: 'Specialised agents',
+        text: 'Behind it, *agents built for specific tasks* help you go deeper on exactly what you want to focus on.',
       },
     ],
   },
@@ -27,6 +33,7 @@ export const projects = [
     slug: 'mockp',
     title: 'Mockp',
     year: 2026, // CV: Jul 2026 – presente
+    status: 'In development', // confirmar
     tags: 'Web Platform · Product Design · Front-end',
     image: '/projects/mockp.jpg',
     url: 'https://mockp.com',
@@ -36,15 +43,39 @@ export const projects = [
     sections: [
       {
         heading: 'A catalogue, not a template pack',
-        text: 'The idea was a huge catalogue, big enough that every user can define their own style as precisely as they want — finding the scene that fits their work instead of settling for the one that is close enough.',
+        text: 'The idea was a huge catalogue, big enough that every user can *define their own style* as precisely as they want — finding *the scene that fits their work* instead of settling for the one that is close enough.',
       },
       {
         heading: 'Browse, design, download',
-        text: 'Discover mockups the way you browse a moodboard, open one, drop your design in and download it at full quality. No paywall in front of the work.',
+        text: 'Discover mockups the way you browse a moodboard, open one, drop your design in and *download it at full quality*. *No paywall* in front of the work.',
       },
       {
         heading: 'Built on',
-        text: 'A React + Vite front-end, Supabase as the backend and Stripe as the payment gateway.',
+        text: 'A *React + Vite* front-end, *Supabase* as the backend and *Stripe* as the payment gateway.',
+      },
+    ],
+  },
+  {
+    slug: 'dakubo',
+    title: 'Dakubo',
+    year: 2026, // confirmar
+    status: 'Live', // confirmar
+    tags: 'Agency Website · Branding · Motion',
+    image: '/projects/dakubo-poster.jpg',
+    video: '/projects/dakubo.mp4',
+    url: 'https://dakubo.com',
+    role: 'Logo, interface design, motion design, development',
+    // tools: [...] — pendiente: la fila Stack sale cuando exista
+    intro:
+      'The website of Dakubo, a studio that designs and builds websites and apps — its work, what it does, and a budget calculator built in.',
+    sections: [
+      {
+        heading: 'A portfolio for the studio',
+        text: 'The *projects* up front, the services explained without jargon, and a *built-in budget calculator* so a client can price their idea before writing a single email.',
+      },
+      {
+        heading: 'One pair of hands',
+        text: 'The *logo*, the *interface*, the *motion design* and the *code* — designed, programmed and shipped by me, from the first sketch to production.',
       },
     ],
   },

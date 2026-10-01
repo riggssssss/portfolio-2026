@@ -14,10 +14,16 @@
 }
 
 :root {
-  /* The two global tones: --bg is the site's white, --ink its (soft) black. */
+  /* --bg is the site's white. Three inks, equal steps of lightness (OKLCH L
+     .27 / .45 / .63), same warm-neutral hue:
+     --ink   content: titles, body copy, the active card's name
+     --ink-2 interface: menu, clock, tags, "Mockp"
+     --ink-3 whispers: bio, "by", "Now building", fact labels, section headings,
+             card names at rest */
   --bg: #ececea;
-  --ink: #262624;
-  --muted: #5f5f5c;
+  --ink: oklch(0.27 0.004 100);
+  --ink-2: oklch(0.45 0.004 100);
+  --ink-3: oklch(0.63 0.004 100);
   --tile: #dcdcd9;
   --rule: #d2d2cf;
   --accent: #d5ff2e; /* used almost nowhere: bio marks, menu hover, text selection */
@@ -25,11 +31,11 @@
   --gap: clamp(10px, 1.1vw, 18px);
   --card-gap: clamp(4px, 0.4vw, 8px);
   --bar-h: 64px;
-  /* The back arrow's own row, above both project columns. */
-  --back-h: clamp(44px, 6svh, 64px);
+  --nav-mid: 40px;
+  --work-h: 58svh;
   --title: clamp(2rem, 3.4vw, 3.75rem);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-io: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-io: cubic-bezier(0.5, 0, 0.2, 1);
   color-scheme: light;
 }
 
@@ -51,7 +57,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: 'GT Walsheim', 'Schibsted Grotesk Variable', system-ui, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.35;
   letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
@@ -107,17 +113,18 @@ svg {
 .by {
   font-family: 'GT Walsheim', 'Schibsted Grotesk Variable', system-ui, sans-serif;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: -0.005em;
 }
 
 .role,
-.clock {
-  color: var(--muted);
+.by {
+  color: var(--ink-3);
 }
 
-.by {
-  color: color-mix(in srgb, var(--muted) 55%, var(--bg));
+.nav,
+.clock {
+  color: var(--ink-2);
 }
 
 .role {
@@ -127,12 +134,11 @@ svg {
 }
 
 .role {
-  transition: opacity 0.5s var(--ease-out), visibility 0.5s;
+  animation: fade-in 0.6s var(--ease-out) both;
 }
 
-.is-project .role {
-  opacity: 0;
-  visibility: hidden;
+.role.is-leaving {
+  animation: fade-out 0.35s var(--ease-out) both;
 }
 
 .clock {
@@ -142,6 +148,8 @@ svg {
 
 .nav {
   grid-column: 3;
+  /* Only as wide as its links, so it never covers the back arrow. */
+  justify-self: start;
   display: flex;
   gap: 1.2em;
 }
@@ -196,7 +204,8 @@ svg {
 .page {
   height: 100svh;
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  /* The strip takes a bit more than half: the work is the page. */
+  grid-template-rows: 1fr var(--work-h);
   touch-action: none;
   user-select: none;
 }
@@ -207,7 +216,8 @@ svg {
   align-items: flex-end;
   gap: var(--gap);
   padding: var(--gutter);
-  padding-bottom: clamp(16px, 3vh, 36px);
+  /* Close to the strip: the name reads as the caption of the work. */
+  padding-bottom: 6px;
   min-height: 0;
 }
 
@@ -219,18 +229,17 @@ mark {
 }
 
 .signature {
-  /* A serif carries more ink than the grotesk; ease it back toward the ground. */
-  color: color-mix(in srgb, var(--ink) 91%, var(--bg));
+  color: var(--ink);
 }
 
 /* Bottom right: the lime counterweight to the bio's marks. */
 .now {
   flex: none;
-  color: var(--muted);
+  color: var(--ink-3);
 }
 
 .now a {
-  color: var(--ink);
+  color: var(--ink-2);
 }
 
 /* Hover fills the marker: it reads as a link without an underline. */
@@ -267,7 +276,7 @@ mark {
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.03em;
-  color: color-mix(in srgb, var(--ink) 91%, var(--bg));
+  color: var(--ink);
   padding-bottom: 0.06em;
 }
 
@@ -282,7 +291,7 @@ mark {
 
 .track {
   /* Headroom so a hovered card can grow without clipping. */
-  --card-h: calc((50svh - var(--gutter) - 28px) / 1.1);
+  --card-h: calc((var(--work-h) - var(--gutter) - 28px) / 1.1);
   height: 100%;
   display: flex;
   align-items: flex-end;
@@ -315,9 +324,19 @@ mark {
   visibility: hidden;
 }
 
-/* Its caption is flying as the page title. */
+/* The caption fades as the card leaves, and back when it lands. */
+.card-caption {
+  color: var(--ink-3);
+  transition: opacity 0.5s var(--ease-out), color 0.4s var(--ease-out);
+}
+
+/* The hovered card (mouse) or the centred one (touch): its name comes forward. */
+.card.is-active .card-caption {
+  color: var(--ink);
+}
+
 .card.is-lifted .card-caption {
-  visibility: hidden;
+  opacity: 0;
 }
 
 .card-media,
@@ -361,20 +380,30 @@ mark {
 
 .pm {
   position: fixed;
-  top: calc(var(--bar-h) + var(--back-h));
+  top: var(--bar-h);
   left: var(--gutter);
   width: calc(50vw - var(--gutter) * 1.5);
-  height: calc(100svh - var(--bar-h) - var(--back-h) - var(--gutter));
+  height: calc(100svh - var(--bar-h) - var(--gutter));
   z-index: 1;
 }
 
-.pm-ghost {
-  z-index: 0;
+/* Next project: falls over this one inside the media frame. */
+.pm-curtain {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 100% 0);
+}
+
+.pm-curtain > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .pr {
   position: fixed;
-  top: calc(var(--bar-h) + var(--back-h));
+  top: var(--bar-h);
   bottom: 0;
   left: calc(50vw + var(--gutter) * 0.5);
   right: 0;
@@ -395,18 +424,27 @@ mark {
   flex-direction: column;
 }
 
-.pr-title-flying {
-  position: fixed;
-  z-index: 3;
-  pointer-events: none;
+/* Leaving for the next project: once the curtain is down the text fades. */
+.proj.is-leaving .pr-sheet > * {
+  animation: fade-out 0.28s var(--ease-out) both;
+}
+
+.pr-intro {
+  /* Title, tags, lead and facts fill the first screen, sitting on the media's
+     bottom edge; the sections start below the fold. */
+  min-height: calc(100svh - var(--bar-h) - var(--gutter));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .back {
   position: fixed;
-  top: var(--bar-h);
+  /* In the header row, centred on the menu line; the bio is hidden there. */
+  top: var(--nav-mid);
+  translate: 0 -50%;
   left: var(--gutter);
-  z-index: 3;
-  height: var(--back-h);
+  z-index: 4;
   display: flex;
   align-items: center;
   /* Optically flush with the media edge below. */
@@ -427,7 +465,7 @@ mark {
 
 .pr-tags {
   margin-top: 0.7em;
-  color: var(--muted);
+  color: var(--ink-2);
 }
 
 .pr-lead {
@@ -453,7 +491,7 @@ mark {
 }
 
 .pr-facts dt {
-  color: var(--muted);
+  color: var(--ink-3);
 }
 
 .pr-facts dd {
@@ -476,14 +514,14 @@ mark {
 
 .pr-block h2 {
   font-size: inherit;
-  font-weight: 500;
+  font-weight: 400;
+  color: var(--ink-3);
   text-wrap: balance;
 }
 
+/* The bio's voice: menu size, lime marks on what matters. */
 .pr-block p {
-  font-size: 16px;
-  line-height: 1.5;
-  max-width: 58ch;
+  max-width: 62ch;
   text-wrap: pretty;
 }
 
@@ -496,7 +534,7 @@ mark {
 }
 
 .pr-next-label {
-  color: var(--muted);
+  color: var(--ink-3);
 }
 
 .pr-next-row {
@@ -543,6 +581,71 @@ mark {
   }
 }
 
+/* The arrow and the title only fade: no slide, in or out. */
+.proj.is-in .back.rv,
+.proj.is-in .pr-title.rv {
+  animation-name: fade-in;
+  animation-duration: 1.1s;
+}
+
+.proj.is-out .back.rv,
+.proj.is-out .pr-title.rv {
+  animation: fade-out 0.6s var(--ease-out) both;
+}
+
+@keyframes ground-in {
+  from {
+    background: transparent;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Mobile, into a project: fade out on the left, swap sides unseen, settle in
+   on the right as the media lands. */
+@keyframes nav-to-right {
+  0% {
+    justify-self: start;
+    opacity: 1;
+    transform: none;
+    animation-timing-function: ease-out;
+  }
+  18% {
+    justify-self: start;
+    opacity: 0;
+    transform: none;
+  }
+  18.01%,
+  45% {
+    justify-self: end;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    justify-self: end;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
 @keyframes rv-out {
   to {
     opacity: 0;
@@ -556,25 +659,23 @@ mark {
   /* Bio, then the menu on its own line. Inside a project only the menu stays. */
   .bar {
     grid-template-columns: 1fr;
-    row-gap: 12px;
+    row-gap: 28px;
   }
   .role {
     grid-column: 1;
-  }
-  .is-project .role {
-    display: none;
   }
   .nav {
     grid-column: 1;
     gap: 0.9em;
   }
   .hero {
-    font-size: 2rem;
+    /* One line with "Now building" beside it, down to 360px phones. */
+    font-size: min(1.8rem, 7.4vw);
     white-space: nowrap;
   }
   .now {
-    flex: 0 1 auto;
-    text-align: right;
+    flex: none;
+    white-space: nowrap;
   }
   .clock {
     display: none;
@@ -594,13 +695,34 @@ mark {
   .pr-inner {
     padding: calc(46svh + 12px) 0 0;
   }
-  :root {
-    --back-h: 44px;
+  /* Inside a project the menu leaves with the card and comes back on the
+     right, once the media has landed; the arrow takes the left. Coming home it
+     slides back in on the left. */
+  .bar:not(.is-project) .nav {
+    animation: nav-in 0.6s var(--ease-out) both;
+  }
+  .is-project .nav {
+    justify-self: end;
+    /* Its own name, so the animation restarts when the class flips. */
+    animation: nav-to-right 1.3s both;
+  }
+  /* Under the media, the intro fills what's left of the first screen. */
+  .pr-intro {
+    min-height: calc(100svh - var(--bar-h) - 46svh - 12px - 14px);
+    justify-content: flex-start;
+  }
+  /* The sheet's ground covers the media only once it has landed, and lets go
+     of it before it flies back; in flight nothing may cut the media. */
+  .proj.is-in .pr-sheet {
+    animation: ground-in 0s linear 1.05s both;
+  }
+  .proj.is-out .pr-sheet {
+    background: transparent;
   }
   .pr-sheet {
     background: var(--bg);
     padding: 14px var(--gutter) calc(var(--gutter) + env(safe-area-inset-bottom));
-    min-height: calc(100svh - var(--bar-h) - var(--back-h));
+    min-height: calc(100svh - var(--bar-h));
   }
   .pr-block {
     grid-template-columns: 1fr;
@@ -616,5 +738,9 @@ mark {
   }
   .card {
     transition-duration: 1ms;
+  }
+  .nav {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
   }
 }

@@ -60,9 +60,16 @@ export default function Carousel({ items, onOpen, locked }) {
     const grow = cards.map(() => 0)
     const videos = cards.map((c) => c.querySelector('video'))
     let playing = null
+    let active = -1
 
     // Only one card plays: the hovered one (mouse) or the centered one (touch).
+    // It's also the one whose name lights up.
     const play = (i) => {
+      if (i !== active) {
+        cards[active]?.classList.remove('is-active')
+        cards[i]?.classList.add('is-active')
+        active = i
+      }
       const v = videos[i] ?? null
       if (v === playing) return
       playing?.pause()

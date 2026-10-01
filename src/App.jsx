@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import Carousel from './Carousel.jsx'
 import Project from './Project.jsx'
 import { syncBarHeight } from './bar.js'
+import { marked } from './marked.jsx'
 import { projects, site } from './projects.js'
 
 const fromPath = () => {
@@ -31,6 +32,8 @@ export default function App() {
     return i == null ? null : { index: i, from: null }
   })
   const [closing, setClosing] = useState(false)
+  // The bio fades out, then leaves the DOM for as long as a project is open.
+  const [bioGone, setBioGone] = useState(view != null)
   const nowIndex = projects.findIndex((p) => p.slug === site.now)
 
   const open = useCallback((i) => {
@@ -43,9 +46,10 @@ export default function App() {
     if (push) history.pushState(null, '', '/')
   }, [])
 
-  const next = (rect) => {
+  // Project already curtained the next media in; swap the page under it.
+  const next = (time) => {
     const i = (view.index + 1) % projects.length
-    setView({ index: i, from: { type: 'rect', rect, ghost: view.index } })
+    setView({ index: i, from: { type: 'curtain', time } })
     history.pushState(null, '', `/proyecto/${projects[i].slug}`)
   }
 
@@ -70,6 +74,12 @@ export default function App() {
       removeEventListener('keydown', onKey)
     }
   }, [view, closing, close])
+
+  useEffect(() => {
+    if (!view) return setBioGone(false)
+    const id = setTimeout(() => setBioGone(true), 400)
+    return () => clearTimeout(id)
+  }, [!view])
 
   useLayoutEffect(() => {
     const ro = new ResizeObserver(syncBarHeight)
@@ -103,9 +113,8 @@ export default function App() {
 
       {/* Outside the page so it survives every view. */}
       <header className={view ? 'bar is-project' : 'bar'}>
-        <p className="role">
-          {site.bio.split('*').map((part, i) => (i % 2 ? <mark key={i}>{part}</mark> : part))}
-        </p>
+        {/* Not just hidden: gone while a project is open, so it can never linger. */}
+        {!bioGone && <p className={view ? 'role is-leaving' : 'role'}>{marked(site.bio)}</p>}
         <nav className="nav" aria-label="Principal">
           {site.nav.map((l) => (
             <a
