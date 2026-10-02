@@ -270,7 +270,7 @@ export default function Carousel({ items, onOpen, locked, intro }) {
             {/* What hangs and falls on the way to About (hang.js); the engine owns the card. */}
             <div className="card-hang">
               <div className="card-media">
-                <Media p={p} decorative={clone} eager={i < 8} play={false} />
+                <Media p={p} decorative={clone} eager={i < 8} play={false} reveal />
               </div>
               <div className="card-caption">
                 <span>{p.title}</span>
@@ -283,9 +283,30 @@ export default function Carousel({ items, onOpen, locked, intro }) {
   )
 }
 
-export function Media({ p, decorative, eager = true, play = true }) {
+// `reveal`: hidden until it has something to show, then fades in (the card's
+// skeleton waits underneath). Off for project media, which must never blank.
+export function Media({ p, decorative, eager = true, play = true, reveal = false }) {
+  const [ready, setReady] = useState(!reveal)
+  const ref = useRef(null)
+  useEffect(() => {
+    if (!reveal) return
+    const el = ref.current
+    // Already there (cache): no fade needed beyond the first frame.
+    if (el.complete || el.readyState >= 2) return setReady(true)
+    // A video shows its poster first, so the poster loading is enough.
+    if (p.video) {
+      const img = new Image()
+      img.onload = () => setReady(true)
+      img.src = p.image
+    }
+  }, [])
+  const shown = reveal ? { ref, className: ready ? 'is-ready' : 'is-waiting' } : {}
+  const done = reveal ? () => setReady(true) : undefined
+
   return p.video ? (
     <video
+      {...shown}
+      onLoadedData={done}
       src={p.video}
       poster={p.image}
       muted
@@ -296,6 +317,13 @@ export function Media({ p, decorative, eager = true, play = true }) {
       aria-label={decorative ? undefined : p.title}
     />
   ) : (
-    <img src={p.image} alt={decorative ? '' : p.title} draggable={false} loading={eager ? 'eager' : 'lazy'} />
+    <img
+      {...shown}
+      onLoad={done}
+      src={p.image}
+      alt={decorative ? '' : p.title}
+      draggable={false}
+      loading={eager ? 'eager' : 'lazy'}
+    />
   )
 }

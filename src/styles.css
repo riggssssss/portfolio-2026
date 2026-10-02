@@ -253,7 +253,7 @@ mark {
   /* …and that baseline sits on the strip's edge: Lora keeps ~0.13em under it,
      which would make the gap read a gutter and a bit. */
   margin-bottom: -0.2em;
-  /* Lora for the signature line only — the one serif on the page. */
+  /* Lora for the signature line only, the one serif on the page. */
   font-family: 'Lora', Georgia, serif;
   font-size: clamp(1.5rem, 2.4vw, 2.5rem);
   font-weight: 400;
@@ -368,6 +368,53 @@ mark {
 
 .card-media > * {
   will-change: transform;
+}
+
+/* Loading: each picture fades in as it arrives, over the tile. */
+.card-media > .is-waiting {
+  opacity: 0;
+}
+
+.card-media > .is-ready {
+  transition: opacity 0.9s ease-out;
+}
+
+/* Taking longer than it should: a soft sweep over the tile, under the
+   picture, so the picture simply covers it when it lands. */
+.card-media::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 35%,
+    color-mix(in srgb, var(--bg) 55%, transparent) 50%,
+    transparent 65%
+  );
+  background-size: 250% 100%;
+  animation:
+    skeleton-in 0.5s ease-out 0.6s both,
+    skeleton-sweep 1.5s ease-in-out 0.6s infinite;
+}
+
+.card-media:has(> .is-ready)::before {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes skeleton-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
 }
 
 /* Same size and voice as the menu. */
@@ -884,7 +931,7 @@ mark {
 /* ---------- landing intro ---------- */
 
 /* The strip glides in first (Carousel); the rest settles after it in loose,
-   uneven sections — name, then what's being built, bio, menu, clock. */
+   uneven sections: name, then what's being built, bio, menu, clock. */
 html.intro .track {
   animation: fade-in 1.6s ease-out both;
 }
@@ -914,7 +961,7 @@ html.intro .clock {
 }
 
 /* Back home from a project: the cards rise, then the rest settles in, as
-   uneven as the intro but quicker — the visitor has seen it once. */
+   uneven as the intro but quicker, the visitor has seen it once. */
 html.returning .hero {
   animation: intro-up 1.3s var(--ease-out) 0.05s both;
 }

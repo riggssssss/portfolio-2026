@@ -9,13 +9,13 @@ export const about = {
   skills: ['JavaScript', 'TypeScript', 'React', 'Next.js', 'HTML', 'CSS', 'Java', 'Supabase', 'Git/GitHub', 'Figma', 'UX/UI design'],
   education: [
     {
-      dates: '2026 — Now',
+      dates: '2026 – Now',
       place: 'Universitat Oberta de Catalunya',
       role: 'BSc Computer Engineering',
       note: 'Studying alongside professional work in product design.',
     },
     {
-      dates: '2024 — 2026',
+      dates: '2024 – 2026',
       place: 'IES Álvaro Falomir',
       role: 'Higher Diploma in Multiplatform App Development (DAM)',
     },

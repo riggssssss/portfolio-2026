@@ -1,5 +1,5 @@
-// Home ⇄ About. The home pieces — the name, the cards on screen, "Now building"
-// — are bodies, not tweens. Going to About each one is let go in turn (every
+// Home ⇄ About. The home pieces (the name, the cards on screen, "Now building")
+// are bodies, not tweens. Going to About each one is let go in turn (every
 // other piece first, the ones between right after): a small hop off its hook,
 // then real gravity, each a touch heavier or lighter than the next. Coming back
 // a spring catches each one and pulls it up onto its hook, overshooting a hair
@@ -7,7 +7,7 @@
 // mid-way just changes the force acting on everything already in flight.
 //
 // The About text doesn't fall: it rides a progress value that runs at constant
-// speed toward its target. onFrame(p, resting) — resting once every body stopped.
+// speed toward its target. onFrame(p, resting): resting once every body stopped.
 
 const TEXT = 0.8 // s, progress 0 → 1 for the About text
 const G = 5200 // px/s²

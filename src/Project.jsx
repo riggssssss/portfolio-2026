@@ -6,7 +6,7 @@ import { smoothScroll } from './smooth.js'
 import { marked } from './marked.jsx'
 
 // Nothing is rebuilt between views: the card becomes the page's media, and from
-// project to project the page recycles itself — the media curtains in, every
+// project to project the page recycles itself: the media curtains in, every
 // piece of text swaps its content in place, labels that don't change stay put.
 const EASE = 'cubic-bezier(0.5, 0, 0.2, 1)'
 const DUR = 1050
@@ -97,14 +97,38 @@ export default function Project({ index, from, closing, onClosed, onNext, onBack
 
   useEffect(() => smoothScroll(scrollRef.current, window), [])
 
-  // Inside a project the video always runs. Set muted as a property too: React
-  // doesn't render the attribute, and without it Safari refuses autoplay.
+  // Inside a project the video always runs, looping, whatever the phone does:
+  // a pause nobody asked for (iOS low power, a blocked autoplay, a tab coming
+  // back) is undone, an end without a loop restarts, and a blocked start gets
+  // its go on the first touch. Muted as attribute and property: React renders
+  // neither reliably, and without them Safari refuses autoplay.
   useEffect(() => {
-    const v = mediaRef.current.querySelector('video')
-    if (!v) return
-    v.muted = true
-    v.play().catch(() => {})
-  }, [])
+    const videos = [...mediaRef.current.querySelectorAll('video')]
+    if (!videos.length) return
+    const run = () => {
+      if (document.hidden) return
+      videos.forEach((v) => v.isConnected && v.paused && v.play().catch(() => {}))
+    }
+    const again = (e) => ((e.target.currentTime = 0), run())
+    videos.forEach((v) => {
+      v.muted = v.defaultMuted = true
+      v.setAttribute('muted', '')
+      v.setAttribute('playsinline', '')
+      v.loop = true
+      v.addEventListener('pause', run)
+      v.addEventListener('ended', again)
+    })
+    run()
+    document.addEventListener('visibilitychange', run)
+    addEventListener('touchstart', run, { passive: true })
+    addEventListener('pointerdown', run)
+    return () => {
+      videos.forEach((v) => (v.removeEventListener('pause', run), v.removeEventListener('ended', again)))
+      document.removeEventListener('visibilitychange', run)
+      removeEventListener('touchstart', run)
+      removeEventListener('pointerdown', run)
+    }
+  }, [layers])
 
   useEffect(() => {
     if (!closing) return
@@ -207,7 +231,7 @@ export default function Project({ index, from, closing, onClosed, onNext, onBack
     if (layers.length < 2) return
     const layer = mediaRef.current.lastElementChild
     const v = layer.querySelector('video')
-    if (v) (v.muted = true), v.play().catch(() => {})
+    if (v) (v.muted = true), v.play().catch(() => {}) // the keep-playing guard takes it from here
     // On phones the media sits above the text, uncovered as the column glides
     // up: the curtain has to be down before it gets there.
     const cloth = layer.animate([{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0 0)' }], {

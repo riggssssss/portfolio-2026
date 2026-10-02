@@ -13,7 +13,7 @@ export const projects = [
     role: 'Product design, development',
     tools: ['Swift', 'SwiftUI', 'Claude API', 'Supabase', 'Figma'], // confirmar
     intro:
-      'A macOS app that keeps everything you are working on organised in modes — with an AI that knows each one inside out.',
+      'A macOS app that keeps everything you are working on organised in modes, with an AI that knows each one inside out.',
     sections: [
       {
         heading: 'One mode for each thing',
@@ -21,7 +21,7 @@ export const projects = [
       },
       {
         heading: 'An AI with the whole context',
-        text: 'The assistant knows *everything inside the mode* you are in, so it can *answer, create, edit or delete* content for you — without you explaining it all again.',
+        text: 'The assistant knows *everything inside the mode* you are in, so it can *answer, create, edit or delete* content for you, without you explaining it all again.',
       },
       {
         heading: 'Specialised agents',
@@ -39,11 +39,11 @@ export const projects = [
     url: 'https://mockp.com',
     role: 'Product design, full-stack development (personal project)',
     tools: ['React', 'TypeScript', 'Vite', 'Supabase', 'Stripe'],
-    intro: 'A Pinterest of mockups: anyone can browse, design and download their own high-quality mockups — free, for everyone.',
+    intro: 'A Pinterest of mockups: anyone can browse, design and download their own high-quality mockups. Free, for everyone.',
     sections: [
       {
         heading: 'A catalogue, not a template pack',
-        text: 'The idea was a huge catalogue, big enough that every user can *define their own style* as precisely as they want — finding *the scene that fits their work* instead of settling for the one that is close enough.',
+        text: 'The idea was a huge catalogue, big enough that every user can *define their own style* as precisely as they want, finding *the scene that fits their work* instead of settling for the one that is close enough.',
       },
       {
         heading: 'Browse, design, download',
@@ -65,9 +65,9 @@ export const projects = [
     video: '/projects/dakubo.mp4',
     url: 'https://dakubo.com',
     role: 'Logo, interface design, motion design, development',
-    // tools: [...] — pendiente: la fila Stack sale cuando exista
+    // tools: [...]: pendiente: la fila Stack sale cuando exista
     intro:
-      'The website of Dakubo, a studio that designs and builds websites and apps — its work, what it does, and a budget calculator built in.',
+      'The website of Dakubo, a studio that designs and builds websites and apps: its work, what it does, and a built-in budget calculator.',
     sections: [
       {
         heading: 'A portfolio for the studio',
@@ -75,7 +75,7 @@ export const projects = [
       },
       {
         heading: 'One pair of hands',
-        text: 'The *logo*, the *interface*, the *motion design* and the *code* — designed, programmed and shipped by me, from the first sketch to production.',
+        text: 'The *logo*, the *interface*, the *motion design* and the *code*. Designed, programmed and shipped by me, from the first sketch to production.',
       },
     ],
   },
@@ -86,7 +86,7 @@ export const site = {
   role: 'Front-end Developer & Designer',
   // *palabra* = subrayada con el marcador lima
   bio: 'Front-end developer with a background in *product design*. I build interfaces caring as much about the *technical implementation* as about the *experience* of the people who end up using them.',
-  now: 'mockp', // "Now — building …": slug del proyecto en curso
+  now: 'mockp', // "Now building …": slug del proyecto en curso
   city: 'Valencia',
   timeZone: 'Europe/Madrid',
   email: 'hello.adrian.gar@gmail.com',
