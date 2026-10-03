@@ -87,10 +87,22 @@ export default function Carousel({ items, onOpen, locked, intro }) {
       }
       const v = videos[i] ?? null
       if (v === playing) return
-      playing?.pause()
-      playing = v
-      v?.play().catch(() => {})
+      const prev = playing
+      playing = v // first, so the pause below isn't taken for an unwanted one
+      prev?.pause()
+      resume()
     }
+    // Phones may refuse a play() that isn't inside a gesture (iOS low power),
+    // or pause on their own: the active video is retried on every touch or
+    // click, on coming back to the tab, and whenever it stops unasked.
+    const resume = () => {
+      if (playing && playing.paused && !document.hidden && !lockedRef.current) playing.play().catch(() => {})
+    }
+    const onVideoPause = (e) => e.target === playing && setTimeout(resume, 0)
+    videos.forEach((v) => v?.addEventListener('pause', onVideoPause))
+    document.addEventListener('visibilitychange', resume)
+    addEventListener('touchend', resume, { passive: true })
+    addEventListener('pointerdown', resume)
 
     // Wheel: vertical or horizontal deltas both drive the strip.
     const onWheel = (e) => {
@@ -236,7 +248,13 @@ export default function Carousel({ items, onOpen, locked, intro }) {
 
     return () => {
       cancelAnimationFrame(raf)
-      playing?.pause()
+      videos.forEach((v) => v?.removeEventListener('pause', onVideoPause))
+      document.removeEventListener('visibilitychange', resume)
+      removeEventListener('touchend', resume)
+      removeEventListener('pointerdown', resume)
+      const last = playing
+      playing = null
+      last?.pause()
       removeEventListener('wheel', onWheel)
       track.removeEventListener('pointerdown', onDown)
       removeEventListener('pointermove', onMove)
@@ -270,7 +288,7 @@ export default function Carousel({ items, onOpen, locked, intro }) {
             {/* What hangs and falls on the way to About (hang.js); the engine owns the card. */}
             <div className="card-hang">
               <div className="card-media">
-                <Media p={p} decorative={clone} eager={i < 8} play={false} reveal />
+                <Media p={p} decorative={clone} eager={i < 8} play={false} reveal preload="none" />
               </div>
               <div className="card-caption">
                 <span>{p.title}</span>
@@ -285,12 +303,17 @@ export default function Carousel({ items, onOpen, locked, intro }) {
 
 // `reveal`: hidden until it has something to show, then fades in (the card's
 // skeleton waits underneath). Off for project media, which must never blank.
-export function Media({ p, decorative, eager = true, play = true, reveal = false }) {
+// Cards pass preload="none": six copies of the strip would otherwise all stream
+// at once and starve the one that's playing; a card loads when it plays.
+export function Media({ p, decorative, eager = true, play = true, reveal = false, preload = 'auto' }) {
   const [ready, setReady] = useState(!reveal)
   const ref = useRef(null)
   useEffect(() => {
-    if (!reveal) return
     const el = ref.current
+    // React never writes the `muted` attribute, and Safari (iOS above all)
+    // wants it, not just the property, before it lets a video play by itself.
+    if (p.video) (el.muted = el.defaultMuted = true), el.setAttribute('muted', '')
+    if (!reveal) return
     // Already there (cache): no fade needed beyond the first frame.
     if (el.complete || el.readyState >= 2) return setReady(true)
     // A video shows its poster first, so the poster loading is enough.
@@ -300,7 +323,7 @@ export function Media({ p, decorative, eager = true, play = true, reveal = false
       img.src = p.image
     }
   }, [])
-  const shown = reveal ? { ref, className: ready ? 'is-ready' : 'is-waiting' } : {}
+  const shown = reveal ? { ref, className: ready ? 'is-ready' : 'is-waiting' } : { ref }
   const done = reveal ? () => setReady(true) : undefined
 
   return p.video ? (
@@ -313,7 +336,7 @@ export function Media({ p, decorative, eager = true, play = true, reveal = false
       loop
       playsInline
       autoPlay={play}
-      preload="metadata"
+      preload={preload}
       aria-label={decorative ? undefined : p.title}
     />
   ) : (

@@ -1,4 +1,6 @@
 // *palabras* en sections[].text = marcador lima.
+// Archivos con hash del contenido en el nombre (nombre.hash.ext): al sustituir uno,
+// renómbralo con su nuevo hash para que ninguna caché mezcle versiones.
 // Imágenes en /public/projects/ (vertical, ~4:5). `video` opcional (usa `image` como poster).
 export const projects = [
   {
@@ -7,8 +9,8 @@ export const projects = [
     year: 2026, // confirmar
     status: 'MVP', // confirmar
     tags: 'macOS App · Product Design · AI',
-    image: '/projects/beside-poster.jpg',
-    video: '/projects/beside.mp4',
+    image: '/projects/beside-poster.a6bfbd70.jpg',
+    video: '/projects/beside.3d4a2ed1.mp4',
     // Sin dominio todavía: la fila Web no sale.
     role: 'Product design, development',
     tools: ['Swift', 'SwiftUI', 'Claude API', 'Supabase', 'Figma'], // confirmar
@@ -35,7 +37,7 @@ export const projects = [
     year: 2026, // CV: Jul 2026 – presente
     status: 'In development', // confirmar
     tags: 'Web Platform · Product Design · Front-end',
-    image: '/projects/mockp.jpg',
+    image: '/projects/mockp.4838e38a.jpg',
     url: 'https://mockp.com',
     role: 'Product design, full-stack development (personal project)',
     tools: ['React', 'TypeScript', 'Vite', 'Supabase', 'Stripe'],
@@ -61,8 +63,8 @@ export const projects = [
     year: 2026, // confirmar
     status: 'Live', // confirmar
     tags: 'Agency Website · Branding · Motion',
-    image: '/projects/dakubo-poster.jpg',
-    video: '/projects/dakubo.mp4',
+    image: '/projects/dakubo-poster.4b3167ef.jpg',
+    video: '/projects/dakubo.d8e2aa7d.mp4',
     url: 'https://dakubo.com',
     role: 'Logo, interface design, motion design, development',
     // tools: [...]: pendiente: la fila Stack sale cuando exista
