@@ -735,6 +735,13 @@ mark {
   filter: blur(calc((1 - var(--k)) * (1 - var(--k)) * 8px));
 }
 
+/* Leaving, the lines don't sink back the way they came: they lift a touch and
+   fade, so nothing seems to drop toward the strip that's rising. */
+.ab:not(.is-on) .ar {
+  translate: 0 calc((1 - var(--k)) * -14px);
+  filter: blur(calc((1 - var(--k)) * 4px));
+}
+
 .ab {
   position: fixed;
   inset: 0;
@@ -1105,6 +1112,12 @@ html.returning .clock {
   .pr-block {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+  /* On phones the sections read in the lead's voice. */
+  .pr-block p {
+    font-size: clamp(1.25rem, 1.75vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
   }
 
   /* About: one column; labels sit above what they name. */
