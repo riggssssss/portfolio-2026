@@ -1,6 +1,8 @@
 // *palabras* en sections[].text = marcador lima.
 // Archivos con hash del contenido en el nombre (nombre.hash.ext): al sustituir uno,
 // renómbralo con su nuevo hash para que ninguna caché mezcle versiones.
+// El poster de un vídeo es SU PRIMER FOTOGRAMA (ffmpeg -frames:v 1): si no, al
+// empezar a reproducirse la imagen salta del poster al fotograma 0.
 // Imágenes en /public/projects/ (vertical, ~4:5). `video` opcional (usa `image` como poster).
 export const projects = [
   {
@@ -9,8 +11,8 @@ export const projects = [
     year: 2026, // confirmar
     status: 'MVP', // confirmar
     tags: 'macOS App · Product Design · AI',
-    image: '/projects/beside-poster.a6bfbd70.jpg',
-    video: '/projects/beside.3d4a2ed1.mp4',
+    image: '/projects/beside-poster.86d4f9a3.jpg',
+    video: '/projects/beside.e7d541b9.mp4',
     // Sin dominio todavía: la fila Web no sale.
     role: 'Product design, development',
     tools: ['Swift', 'SwiftUI', 'Claude API', 'Supabase', 'Figma'], // confirmar
@@ -63,7 +65,7 @@ export const projects = [
     year: 2026, // confirmar
     status: 'Live', // confirmar
     tags: 'Agency Website · Branding · Motion',
-    image: '/projects/dakubo-poster.4b3167ef.jpg',
+    image: '/projects/dakubo-poster.6096a958.jpg',
     video: '/projects/dakubo.d8e2aa7d.mp4',
     url: 'https://dakubo.com',
     role: 'Logo, interface design, motion design, development',

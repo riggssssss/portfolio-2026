@@ -27,6 +27,32 @@ function findCard(i) {
   return best
 }
 
+// A still of a video's current frame, to stand in for another video until that
+// one shows the same frame — so a handover between the card and the page never
+// flashes a poster or jumps in time.
+function still(video) {
+  if (!video || video.readyState < 2 || !video.videoWidth) return null
+  const c = document.createElement('canvas')
+  c.width = video.videoWidth
+  c.height = video.videoHeight
+  c.getContext('2d').drawImage(video, 0, 0)
+  c.className = 'still'
+  return c
+}
+
+// Calls back once `video` shows the frame at `t` (or after a safety timeout).
+function whenAt(video, t, cb) {
+  const t0 = performance.now()
+  let raf = 0
+  const check = () => {
+    const there = video.readyState >= 2 && !video.seeking && Math.abs(video.currentTime - t) < 0.4
+    if (there || performance.now() - t0 > 4000) return void (raf = requestAnimationFrame(cb))
+    raf = requestAnimationFrame(check)
+  }
+  check()
+  return () => cancelAnimationFrame(raf)
+}
+
 // Take the card out of the strip without animating, so its slot can be measured.
 function lift(card) {
   document.querySelectorAll('.card.is-lifted').forEach((c) => c !== card && c.classList.remove('is-lifted'))
@@ -80,12 +106,20 @@ export default function Project({ index, from, closing, onClosed, onNext, onBack
       lift(card)
       const cv = card.querySelector('video')
       const pv = media.querySelector('video')
-      if (cv && pv) pv.currentTime = cv.currentTime
+      if (cv && pv) {
+        // The page's video is new and still loading: the card's frame flies on
+        // top of it until it catches up.
+        const t = cv.currentTime
+        const frame = still(cv)
+        if (frame) pv.after(frame)
+        pv.currentTime = t
+        const stop = whenAt(pv, t, () => frame?.remove())
+        anims.push({ cancel: () => (stop(), frame?.remove()) })
+      }
       anims.push(media.animate([box(source), box(target)], opts))
-      anims.push(
-        media
-          .querySelector('.pm-layer > *')
-          .animate([{ transform: cardMedia.firstElementChild.style.transform }, { transform: 'none' }], opts)
+      // From the card's crop (its parallax zoom) to the page's.
+      media.querySelectorAll('.pm-layer > *').forEach((el) =>
+        anims.push(el.animate([{ transform: cardMedia.firstElementChild.style.transform }, { transform: 'none' }], opts))
       )
     } else {
       anims.push(media.animate([{ clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], opts))
@@ -138,11 +172,18 @@ export default function Project({ index, from, closing, onClosed, onNext, onBack
     rootRef.current.classList.add('is-out')
     const anims = []
 
+    const cardMedia = card?.querySelector('.card-media')
+    const crop = cardMedia?.firstElementChild.style.transform || 'none'
     if (card) {
       lift(card)
       scatter(card)
-      const slot = card.querySelector('.card-media').getBoundingClientRect()
+      const slot = cardMedia.getBoundingClientRect()
       anims.push(media.animate([box(media.getBoundingClientRect()), box(slot)], opts))
+      // Land in the card's crop too (its parallax zoom), or the picture jumps
+      // at the handover.
+      media.querySelectorAll('.pm-layer:last-child > *').forEach((el) =>
+        anims.push(el.animate([{ transform: 'none' }, { transform: crop }], opts))
+      )
     } else {
       anims.push(media.animate([{ opacity: 1 }, { opacity: 0 }], { ...opts, duration: dur() / 2 }))
     }
@@ -151,6 +192,17 @@ export default function Project({ index, from, closing, onClosed, onNext, onBack
     Promise.all(anims.map((a) => a.finished)).then(() => {
       if (done) return
       done = true
+      // The card's video is paused somewhere else (or never loaded): the page's
+      // last frame stays on the card until the card's video is on that frame.
+      const pv = media.querySelector('.pm-layer:last-child video')
+      const cv = cardMedia?.querySelector('video')
+      if (pv && cv) {
+        const frame = still(pv)
+        if (frame) (frame.style.transform = crop), cardMedia.append(frame)
+        cv.preload = 'auto'
+        cv.currentTime = pv.currentTime
+        whenAt(cv, pv.currentTime, () => frame?.remove())
+      }
       card?.classList.remove('is-lifted')
       onClosed()
     }, () => {})

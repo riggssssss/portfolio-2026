@@ -211,6 +211,13 @@ export default function Carousel({ items, onOpen, locked, intro }) {
       const want = reduce ? 0 : Math.min(speed / SPEED_MAX, 1)
       intensity += (want - intensity) * (1 - Math.pow(1 - 0.09, dt))
 
+      // A project covering the strip: the hovered card never hears the pointer
+      // leave, so forget it here, or it would grow back on the way home.
+      if (lockedRef.current && hovered !== -1) {
+        hovered = -1
+        if (byHover) play(-1)
+      }
+
       let growing = false
       const kg = 1 - Math.pow(1 - 0.1, dt)
       for (let i = 0; i < cards.length; i++) {

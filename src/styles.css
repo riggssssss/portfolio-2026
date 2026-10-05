@@ -10,7 +10,7 @@
   --ink: oklch(0.27 0.004 100);
   --ink-2: oklch(0.45 0.004 100);
   --ink-3: oklch(0.63 0.004 100);
-  --tile: #dcdcd9;
+  --tile: #e3e3e1; /* the boxes' ground before a picture lands */
   --rule: #d2d2cf;
   --accent: #d5ff2e; /* used almost nowhere: bio marks, menu hover, text selection */
   --gutter: clamp(16px, 1.6vw, 28px);
@@ -453,6 +453,13 @@ mark {
   display: block;
 }
 
+/* A frozen frame laid over a video during a card ↔ page handover. */
+.pm-layer > .still,
+.card-media > .still {
+  position: absolute;
+  inset: 0;
+}
+
 /* Swapping text keeps its own box, so it can rise and fall on its own. */
 [data-swap] {
   display: block;
@@ -669,7 +676,7 @@ mark {
 @keyframes nav-to-right {
   0% {
     justify-self: start;
-    opacity: 1;
+    opacity: 0;
     transform: none;
     animation-timing-function: ease-out;
   }
@@ -1007,6 +1014,17 @@ html.returning .clock {
   .nav {
     grid-column: 1;
     gap: 0.9em;
+  }
+  /* Home: the bar spans the whole upper half and the menu sits midway between
+     the bio and the strip. */
+  .bar:not(.is-project) {
+    height: calc(100svh - var(--work-h));
+    grid-template-rows: auto 1fr;
+    row-gap: 0;
+    padding-bottom: 0;
+  }
+  .bar:not(.is-project) .nav {
+    align-self: center;
   }
   .hero {
     /* One line with "Now building" beside it, down to 360px phones. */
