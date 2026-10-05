@@ -69,12 +69,15 @@ export default function App() {
   }, [])
   // Coming home from a project the header and the name settle back in the same
   // staggered way (`returning`); like the intro, it stays until the next open.
-  const hadView = useRef(view != null)
+  // Going to a project or to About drops both, or they would outrank those
+  // pages' own entrances and exits (the bio lingering over the menu).
+  const was = useRef({ view, about })
   useLayoutEffect(() => {
     const root = document.documentElement
-    if (view) (hadView.current = true), root.classList.remove('intro', 'returning')
-    else if (hadView.current) root.classList.add('returning')
-  }, [view])
+    if (view || about) root.classList.remove('intro', 'returning')
+    else if (was.current.view) root.classList.add('returning')
+    was.current = { view, about }
+  }, [view, about])
 
   const open = useCallback((i) => {
     setView({ index: i, from: { type: 'card' } })
@@ -180,7 +183,7 @@ export default function App() {
       {aboutOn && <About active={about} rootRef={aboutRef} />}
 
       {/* Outside the page so it survives every view. */}
-      <header className={view ? 'bar is-project' : 'bar'}>
+      <header className={view ? 'bar is-project' : about ? 'bar is-about' : 'bar'}>
         {/* Not just hidden: gone while a project is open, so it can never linger. */}
         {!bioGone && <p className={bioAway ? 'role is-leaving' : 'role'}>{marked(site.bio)}</p>}
         <nav className="nav" aria-label="Principal">
