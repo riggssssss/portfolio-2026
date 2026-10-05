@@ -1,0 +1,282 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-05T13:17:18.598612+00:00",
+  "title": "Design System: Adrián García — Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#ececea",
+        "tonalRamp": [
+          "oklch(0.15 0.003 100)",
+          "oklch(0.27 0.003 100)",
+          "oklch(0.38 0.003 100)",
+          "oklch(0.45 0.003 100)",
+          "oklch(0.55 0.003 100)",
+          "oklch(0.63 0.003 100)",
+          "oklch(0.8 0.003 100)",
+          "oklch(0.93 0.003 100)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Pencil Dark",
+        "canonical": "oklch(0.27 0.004 100)",
+        "tonalRamp": [
+          "oklch(0.15 0.004 100)",
+          "oklch(0.27 0.004 100)",
+          "oklch(0.38 0.004 100)",
+          "oklch(0.45 0.004 100)",
+          "oklch(0.55 0.004 100)",
+          "oklch(0.63 0.004 100)",
+          "oklch(0.8 0.004 100)",
+          "oklch(0.93 0.004 100)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Pencil Mid",
+        "canonical": "oklch(0.45 0.004 100)",
+        "tonalRamp": [
+          "oklch(0.15 0.004 100)",
+          "oklch(0.27 0.004 100)",
+          "oklch(0.38 0.004 100)",
+          "oklch(0.45 0.004 100)",
+          "oklch(0.55 0.004 100)",
+          "oklch(0.63 0.004 100)",
+          "oklch(0.8 0.004 100)",
+          "oklch(0.93 0.004 100)"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Pencil Light",
+        "canonical": "oklch(0.63 0.004 100)",
+        "tonalRamp": [
+          "oklch(0.15 0.004 100)",
+          "oklch(0.27 0.004 100)",
+          "oklch(0.38 0.004 100)",
+          "oklch(0.45 0.004 100)",
+          "oklch(0.55 0.004 100)",
+          "oklch(0.63 0.004 100)",
+          "oklch(0.8 0.004 100)",
+          "oklch(0.93 0.004 100)"
+        ]
+      },
+      "tile": {
+        "role": "neutral",
+        "displayName": "Tile",
+        "canonical": "#e3e3e1",
+        "tonalRamp": [
+          "oklch(0.15 0.003 100)",
+          "oklch(0.27 0.003 100)",
+          "oklch(0.38 0.003 100)",
+          "oklch(0.45 0.003 100)",
+          "oklch(0.55 0.003 100)",
+          "oklch(0.63 0.003 100)",
+          "oklch(0.8 0.003 100)",
+          "oklch(0.93 0.003 100)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "canonical": "#d2d2cf",
+        "tonalRamp": [
+          "oklch(0.15 0.003 100)",
+          "oklch(0.27 0.003 100)",
+          "oklch(0.38 0.003 100)",
+          "oklch(0.45 0.003 100)",
+          "oklch(0.55 0.003 100)",
+          "oklch(0.63 0.003 100)",
+          "oklch(0.8 0.003 100)",
+          "oklch(0.93 0.003 100)"
+        ]
+      },
+      "highlighter-lime": {
+        "role": "primary",
+        "displayName": "Highlighter Lime",
+        "canonical": "#d5ff2e",
+        "tonalRamp": [
+          "oklch(0.15 0.2 123)",
+          "oklch(0.27 0.2 123)",
+          "oklch(0.38 0.2 123)",
+          "oklch(0.45 0.2 123)",
+          "oklch(0.55 0.2 123)",
+          "oklch(0.63 0.2 123)",
+          "oklch(0.8 0.2 123)",
+          "oklch(0.93 0.2 123)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "About statement and 404; one per page, low on the first screen."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Project and next-project titles, About closing email."
+      },
+      "signature": {
+        "displayName": "Signature",
+        "purpose": "'Adrián García' on the home strip's edge."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Project intro, About lead, 404 line; phone section text."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All small type: bio, menu, clock, names, facts."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Entrances, text, hover."
+      },
+      {
+        "name": "ease-io",
+        "value": "cubic-bezier(0.5, 0, 0.2, 1)",
+        "purpose": "Shared-element flights and curtains (1050ms)."
+      },
+      {
+        "name": "carousel-lerp",
+        "value": "0.07",
+        "purpose": "Glide of the work strip."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "760px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Words, not buttons; current page keeps a lime marker band.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">Work</a><a href=\"#\">About</a><a href=\"#\">Contact</a></nav>",
+      "css": ".ds-nav{display:flex;gap:1.2em;font:400 15px/1.35 'Figtree Variable',system-ui,sans-serif;letter-spacing:-0.005em}.ds-nav a{position:relative;isolation:isolate;color:var(--ink-2,#5e5e5b);text-decoration:none}.ds-nav a::after{content:'';position:absolute;left:0;right:0;bottom:0.05em;height:0.5em;z-index:-1;background:var(--accent,#d5ff2e);transform:scaleX(0);transform-origin:right;transition:transform .5s cubic-bezier(.16,1,.3,1)}.ds-nav a:hover::after,.ds-nav a[aria-current=page]::after{transform:scaleX(1);transform-origin:left}.ds-nav a:focus-visible{outline:1.5px solid var(--ink,#2b2b29);outline-offset:4px;border-radius:2px}"
+    },
+    {
+      "name": "Marked Link",
+      "kind": "button",
+      "refersTo": "link-marked",
+      "description": "The site's only call to action: text on a lime marker band; hover fills it.",
+      "html": "<a class=\"ds-mark-link\" href=\"#\"><mark>Back to the work</mark> →</a>",
+      "css": ".ds-mark-link{font:400 15px/1.35 'Figtree Variable',system-ui,sans-serif;color:var(--ink,#2b2b29);text-decoration:none}.ds-mark-link mark{color:inherit;background:linear-gradient(transparent 62%,var(--accent,#d5ff2e) 62%,var(--accent,#d5ff2e) 92%,transparent 92%);transition:background .3s}.ds-mark-link:hover mark{background:var(--accent,#d5ff2e)}.ds-mark-link:focus-visible{outline:1.5px solid var(--ink,#2b2b29);outline-offset:4px;border-radius:2px}"
+    },
+    {
+      "name": "Plain Link",
+      "kind": "button",
+      "refersTo": "nav-link",
+      "description": "External links: hairline underline drawn on hover, small arrow.",
+      "html": "<a class=\"ds-link\" href=\"#\">mockp.com <svg viewBox=\"0 0 16 16\" width=\"1em\" height=\"1em\"><path d=\"M5 11l6-6M6 5h5v5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.3\"/></svg></a>",
+      "css": ".ds-link{position:relative;display:inline-flex;align-items:center;gap:.3em;font:400 15px/1.35 'Figtree Variable',system-ui,sans-serif;color:var(--ink,#2b2b29);text-decoration:none}.ds-link::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .5s cubic-bezier(.16,1,.3,1)}.ds-link:hover::after{transform:scaleX(1);transform-origin:left}"
+    },
+    {
+      "name": "Work Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Square-cornered portrait box on Tile; name in Pencil Light, Pencil Dark when active.",
+      "html": "<a class=\"ds-card\" href=\"#\"><span class=\"ds-card-media\"></span><span class=\"ds-card-name\">Beside</span></a>",
+      "css": ".ds-card{display:flex;flex-direction:column;width:180px;text-decoration:none;font:400 15px/1.35 'Figtree Variable',system-ui,sans-serif}.ds-card-media{display:block;height:230px;background:var(--tile,#e3e3e1);transition:transform .6s cubic-bezier(.16,1,.3,1);transform-origin:50% 100%}.ds-card-name{padding-top:8px;color:var(--ink-3,#8f8f8b);transition:color .4s}.ds-card:hover .ds-card-media{transform:scale(1.06)}.ds-card:hover .ds-card-name,.ds-card:focus-visible .ds-card-name{color:var(--ink,#2b2b29)}"
+    },
+    {
+      "name": "Facts Table",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Label/value rows on hairline rules; labels whisper, values speak.",
+      "html": "<dl class=\"ds-facts\"><div><dt>Year</dt><dd>2026</dd></div><div><dt>Status</dt><dd>Live</dd></div></dl>",
+      "css": ".ds-facts{margin:0;border-top:1px solid var(--rule,#d2d2cf);font:400 15px/1.35 'Figtree Variable',system-ui,sans-serif;width:360px}.ds-facts>div{display:grid;grid-template-columns:1fr 2fr;gap:14px;padding:10px 0;border-bottom:1px solid var(--rule,#d2d2cf)}.ds-facts dt{color:var(--ink-3,#8f8f8b)}.ds-facts dd{margin:0;color:var(--ink,#2b2b29)}"
+    },
+    {
+      "name": "Skill Pill",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "The only rounded, outlined element (About skills).",
+      "html": "<ul class=\"ds-pills\"><li>React</li><li>TypeScript</li><li>Figma</li></ul>",
+      "css": ".ds-pills{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}.ds-pills li{padding:.4em .95em .45em;border:1px solid var(--rule,#d2d2cf);border-radius:999px;color:var(--ink-2,#5e5e5b);font:400 15px/1.35 'Figtree Variable',system-ui,sans-serif;transition:border-color .3s,color .3s}.ds-pills li:hover{border-color:var(--ink-3,#8f8f8b);color:var(--ink,#2b2b29)}"
+    },
+    {
+      "name": "Signature",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "The home's name line: 'by' in Pencil Light body type, name in Lora.",
+      "html": "<p class=\"ds-sig\"><span>by</span> Adrián García</p>",
+      "css": ".ds-sig{margin:0;font:400 clamp(1.5rem,2.4vw,2.5rem)/1 Lora,Georgia,serif;letter-spacing:-.03em;color:var(--ink,#2b2b29)}.ds-sig span{font:400 15px/1 'Figtree Variable',system-ui,sans-serif;letter-spacing:-.005em;color:var(--ink-3,#8f8f8b)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Working Desk",
+    "overview": "This is the desk of a designer who writes code: a warm grey sheet of paper, three pencils of the same grey in different pressures, and one highlighter. Nothing on the desk is decorative. What matters is marked by hand, in lime, and everything else stays in pencil. The work itself (photographs and videos of real products) is the only colour that isn't a marker.\n\nThe page is mostly empty on purpose. The upper area holds a few lines of small type: the bio, the menu, the local time, the signature. The lower area holds the work strip. Density is low and the scale contrast is high: 15px interface type next to 90px serif statements, with nothing in between pretending to be important.\n\nThe motion is the craft being sold, so it follows the same rule as the desk: continuous, physical, never decorative. Things glide with inertia, fall with gravity and settle, and an element is recycled rather than rebuilt. A flicker, a jump or two things overlapping breaks the illusion that this is one continuous object, and that is treated as a defect.",
+    "keyCharacteristics": [
+      "Warm grey paper with three equal-step greys of the same hue; no pure black, no pure white.",
+      "One highlighter, Highlighter Lime, drawn as a marker band under words and never as a fill or button.",
+      "Two voices: Lora for signatures and statements, Figtree for everything you read or press.",
+      "No boxes, no shadows, no corners. Square images, hairline rules, and empty space as structure.",
+      "Motion with mass: inertia, gravity and springs, all continuous across views."
+    ],
+    "rules": [
+      {
+        "name": "The One Highlighter Rule",
+        "body": "Highlighter Lime appears only as a marker band (a gradient stripe from 62% to 92% of the line height, under the text) or as the selection colour. It is never a button fill, a background panel, a border or text colour. On any screen it marks a handful of words, not regions.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three Pencils Rule",
+        "body": "Every piece of text uses one of the three inks; there are no other greys or opacity hacks. Pick by role: content is `ink`, interface is `ink-2`, whisper is `ink-3`. State changes move one step (a card name goes from `ink-3` to `ink` when active); they never change weight.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Small Size Rule",
+        "body": "All small type is 15px Figtree 400. Hierarchy among small things comes from the three pencils and from position, never from a 13px/14px/16px ladder or from bold.",
+        "section": "typography"
+      },
+      {
+        "name": "The No-Bold Rule",
+        "body": "Weight never changes, not even on hover or for the current state. Emphasis is the lime marker; importance is ink pressure.",
+        "section": "typography"
+      },
+      {
+        "name": "The Serif Signs Rule",
+        "body": "Lora is only for names and statements (a person's, a project's, the page's thesis). It never sets UI, labels or paragraphs.",
+        "section": "typography"
+      },
+      {
+        "name": "The Same Gutter Rule",
+        "body": "Edges, the name-to-strip gap, and the space under media all use the one gutter. A new surface introduces no new margin.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Desk Rule",
+        "body": "Nothing has a shadow, glow or blur at rest. Blur exists only as motion blur on falling pieces (About), proportional to speed.",
+        "section": "elevation & depth"
+      }
+    ],
+    "dos": [
+      "**Do** mark at most a few phrases per block with the lime marker band, written as `*word*` in content.",
+      "**Do** keep all small type at 15px Figtree 400 and express hierarchy with the three pencils.",
+      "**Do** use Lora only for names and statements, set low on the first screen.",
+      "**Do** make every view change continuous: shared elements fly, text recycles in place, and nothing is rebuilt in view.",
+      "**Do** design and check every change at phone width (360–390px) as well as desktop.",
+      "**Do** export every video's poster from its first frame, and give media files content-hashed names."
+    ],
+    "donts": [
+      "**Don't** use bold, or change weight on hover or for the current state.",
+      "**Don't** use Highlighter Lime as a fill, button, border or text colour.",
+      "**Don't** add shadows, rounded corners on media, cards with borders, or gradient panels.",
+      "**Don't** use pure black (#000) or pure white (#fff), or greys outside the three pencils.",
+      "**Don't** let two elements share a place during a transition. Each must leave before the next arrives on the same line.",
+      "**Don't** add placeholder projects, client logos, metrics or testimonials that aren't real."
+    ]
+  }
+}

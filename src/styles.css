@@ -1009,6 +1009,89 @@ html.returning .clock {
   }
 }
 
+/* ---------- not found ---------- */
+
+/* Sits low on the first screen, where the work would be: the same place the
+   name and About's statement live. */
+.nf {
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--gutter);
+}
+
+.nf-in > * {
+  animation: intro-up 1.2s var(--ease-out) both;
+}
+
+.nf-code {
+  color: var(--ink-3);
+  animation-delay: 0.1s !important;
+}
+
+.nf-title {
+  margin-top: 0.4em;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(2.75rem, 7vw, 7.5rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  padding-bottom: 0.06em;
+  animation-delay: 0.2s !important;
+}
+
+.nf-lead {
+  margin-top: clamp(20px, 4svh, 40px);
+  font-size: clamp(1.25rem, 1.75vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  max-width: 32ch;
+  color: var(--ink-2);
+  text-wrap: pretty;
+  animation-delay: 0.38s !important;
+}
+
+.nf-path {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.nf-row {
+  margin-top: clamp(32px, 7svh, 72px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 40px;
+  animation-delay: 0.55s !important;
+}
+
+.nf-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.nf-home svg {
+  transition: transform 0.5s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .nf-home:hover mark {
+    background: var(--accent);
+  }
+  .nf-home:hover svg {
+    transform: translateX(4px);
+  }
+}
+
+.nf-or {
+  color: var(--ink-3);
+}
+
+.nf-or .link {
+  color: var(--ink-2);
+}
+
 /* ---------- small screens ---------- */
 
 @media (max-width: 760px) {
@@ -1113,7 +1196,12 @@ html.returning .clock {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  /* On phones the sections read in the lead's voice. */
+  /* On phones the sections read in the lead's voice, their headings a step
+     under it. */
+  .pr-block h2 {
+    font-size: 1.125rem;
+    letter-spacing: -0.01em;
+  }
   .pr-block p {
     font-size: clamp(1.25rem, 1.75vw, 1.75rem);
     line-height: 1.2;

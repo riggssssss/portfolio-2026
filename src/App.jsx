@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import About from './About.jsx'
 import Carousel from './Carousel.jsx'
 import Project from './Project.jsx'
+import NotFound from './NotFound.jsx'
 import { syncBarHeight } from './bar.js'
 import { createHang } from './hang.js'
 import { marked } from './marked.jsx'
@@ -13,6 +14,8 @@ const fromPath = () => {
   return i < 0 ? null : i
 }
 const isAbout = () => location.pathname === '/about'
+// Anything that isn't the home, About or a project that exists.
+const isMissing = () => !/^\/?$/.test(location.pathname) && !isAbout() && fromPath() == null
 
 function Clock({ leaving }) {
   const fmt = () =>
@@ -30,6 +33,30 @@ function Clock({ leaving }) {
 }
 
 export default function App() {
+  const [missing] = useState(isMissing)
+  return missing ? <Missing /> : <Site />
+}
+
+// The bar as on About (menu up top, no bio), over the 404. Real links, see NotFound.
+function Missing() {
+  return (
+    <>
+      <NotFound />
+      <header className="bar is-about">
+        <nav className="nav" aria-label="Principal">
+          {site.nav.map((l) => (
+            <a key={l.label} href={l.href}>
+              {l.label}
+            </a>
+          ))}
+        </nav>
+        <Clock />
+      </header>
+    </>
+  )
+}
+
+function Site() {
   const [view, setView] = useState(() => {
     const i = fromPath()
     return i == null ? null : { index: i, from: null }
