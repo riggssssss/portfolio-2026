@@ -1196,16 +1196,16 @@ html.returning .clock {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  /* On phones the sections read in the lead's voice, their headings a step
-     under it. */
-  .pr-block h2 {
-    font-size: 1.125rem;
-    letter-spacing: -0.01em;
+  /* On phones the sections are read, not skimmed: a reading size with open
+     leading, under a heading that stays a label (15px, Pencil Light). The
+     lead's 20px/1.2 is for one sentence, not paragraphs. */
+  .pr-block {
+    gap: 6px;
   }
   .pr-block p {
-    font-size: clamp(1.25rem, 1.75vw, 1.75rem);
-    line-height: 1.2;
-    letter-spacing: -0.02em;
+    font-size: 17px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
   }
 
   /* About: one column; labels sit above what they name. */

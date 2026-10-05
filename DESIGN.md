@@ -127,7 +127,7 @@ The three pencils are the same warm-neutral hue (OKLCH hue 100, chroma 0.004) at
 - **Display** (Lora 400, clamp(2.25rem → 5.75rem), line-height 0.98, letter-spacing −0.035em): the About statement and the 404 "Nothing here." One per page, sitting low on the first screen.
 - **Headline** (Lora 400, clamp(2rem → 3.75rem), line-height 1): the project title, the next-project title, and the closing email on About.
 - **Signature** (Lora 400, clamp(1.5rem → 2.5rem), line-height 1): "Adrián García" on the home, baseline-aligned with "Now building" on the strip's edge. "by" before it is body size in Pencil Light.
-- **Lead** (Figtree 400, clamp(1.25rem → 1.75rem), line-height 1.2, letter-spacing −0.02em, max 32ch): the project intro, the About lead and the 404 explanation. On phones the project section text also takes this size, with headings at 18px.
+- **Lead** (Figtree 400, clamp(1.25rem → 1.75rem), line-height 1.2, letter-spacing −0.02em, max 32ch): the project intro, the About lead and the 404 explanation. On phones the project section text is set at a reading size instead (Figtree 400, 17px, line-height 1.45) under 15px Pencil Light headings: the lead's tight leading is for one sentence, not paragraphs.
 - **Body** (Figtree 400, 15px, line-height 1.35): everything else, including the bio, menu, clock, card names, facts and section text on desktop. There is one size for all small type.
 
 ### Named Rules
