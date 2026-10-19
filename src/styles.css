@@ -940,6 +940,8 @@ mark {
   position: relative;
   overflow: hidden;
   background: var(--tile);
+  /* Its own proportions (Shot sets --ar); a phone may crop it taller. */
+  aspect-ratio: var(--ar);
 }
 
 .pr-shot > * {
@@ -1665,11 +1667,13 @@ html.returning .lang {
     grid-template-columns: 1fr;
     row-gap: 14px;
   }
+  /* The problem is the case's thesis: at the lead's size, a clear step above
+     the notes, so the page opens on what it argues. */
   .pr.is-flow .pr-lead {
     grid-column: 1;
-    font-size: 17px;
-    line-height: 1.45;
-    letter-spacing: -0.01em;
+    font-size: 20px;
+    line-height: 1.32;
+    letter-spacing: -0.015em;
   }
   .pr-url {
     grid-column: 1;
@@ -1690,39 +1694,56 @@ html.returning .lang {
   .pr.is-flow .pr-block p {
     grid-column: 1;
   }
-  /* One column, one shot after another: the videos across the page, the
-     pictures smaller, right then left, so the videos lead. */
+  /* One column read as chapters: each shot with its note close under it
+     (16px), and a long breath before the next (64px), so what belongs
+     together reads together. The shots alternate in scale and edge, so the
+     work leads and the column never repeats itself: the laptop tall and
+     bled to the right edge, the icon small and square at the left edge, the
+     hands across the whole screen, the editor framed by the margins (its
+     interface has to be read), the plans tall and across the screen to
+     close. Bleeding shots reach past the margins into the screen's edge
+     (.pr clips them). */
   .pr-shots {
     grid-template-columns: 1fr;
-    row-gap: calc(var(--gap) * 2);
+    row-gap: 0;
+    margin-top: 56px;
   }
   .pr-shot {
     grid-row: auto;
     grid-column: 1;
+    margin-top: 64px;
   }
   .pr-shots > :nth-child(1) {
     grid-column: 1;
     justify-self: end;
-    width: 72%;
+    width: calc(84% + var(--gutter));
+    margin: 0 calc(var(--gutter) * -1) 0 0;
+    aspect-ratio: 4 / 5;
+  }
+  .pr-shots > :nth-child(1) > * {
+    object-position: 75% 50%;
   }
   .pr-shots > :nth-child(2),
-  .pr-shots > :nth-child(3) {
+  .pr-shots > :nth-child(3),
+  .pr-shots > :nth-child(4),
+  .pr-shots > :nth-child(5) {
     grid-row: auto;
     grid-column: 1;
-    margin-top: 0;
+    margin-top: 64px;
   }
-  .pr-shot.is-parallax {
-    aspect-ratio: 3 / 2;
-  }
-  /* Each note right after its shot, its name above it. The icon, a
-     picture, set left, a little smaller than the laptop (the zigzag). */
   .pr-shots > :nth-child(2) {
     justify-self: start;
-    width: 60%;
+    width: calc(62% + var(--gutter));
+    margin-left: calc(var(--gutter) * -1);
     order: 2;
   }
   .pr-shots > :nth-child(3) {
+    width: calc(100% + var(--gutter) * 2);
+    margin-left: calc(var(--gutter) * -1);
     order: 4;
+  }
+  .pr-shot.is-parallax {
+    aspect-ratio: 3 / 2;
   }
   .pr-note,
   .pr-note.n1,
@@ -1731,7 +1752,7 @@ html.returning .lang {
   .pr-note.n4 {
     grid-row: auto;
     grid-column: 1;
-    margin: 4px 0 8px;
+    margin: 16px 0 0;
     grid-template-columns: 1fr;
     gap: 6px;
   }
@@ -1753,33 +1774,33 @@ html.returning .lang {
   .pr-note.n2 {
     order: 3;
   }
-  /* The large video's note, the editor's video across the page, the last
-     note, and the pricing video across the page. */
   .pr-note.n3 {
     order: 5;
   }
-  .pr-shots > :nth-child(4),
-  .pr-shots > :nth-child(5) {
-    grid-row: auto;
-    grid-column: 1;
-    margin-top: 0;
+  .pr-shots > :nth-child(4) {
     order: 6;
   }
   .pr-note.n4 {
     order: 7;
   }
+  .pr-shots > :nth-child(5) {
+    width: calc(100% + var(--gutter) * 2);
+    margin-left: calc(var(--gutter) * -1);
+    aspect-ratio: 4 / 5;
+    order: 8;
+  }
+  .pr-shots > :nth-child(5) > * {
+    object-position: 58% 50%;
+  }
   .pr.is-flow .pr-shots > .pr-facts {
     grid-row: auto;
     grid-column: 1;
     order: 9;
-    margin-top: 8px;
+    margin-top: 20px;
     /* Read as the notes are: their size and leading. */
     font-size: 17px;
     line-height: 1.45;
     letter-spacing: -0.01em;
-  }
-  .pr-shots > :nth-child(5) {
-    order: 8;
   }
   /* Every step's name at the description's size, so name and text read as
      one voice on a phone. */

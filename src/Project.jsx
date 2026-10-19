@@ -184,7 +184,7 @@ function Shot({ s }) {
       <div className="pr-pan">{media}</div>
     </div>
   ) : (
-    <div className="pr-shot" ref={ref} style={{ aspectRatio: `${s.width} / ${s.height}` }}>
+    <div className="pr-shot" ref={ref} style={{ '--ar': `${s.width} / ${s.height}` }}>
       {media}
     </div>
   )
