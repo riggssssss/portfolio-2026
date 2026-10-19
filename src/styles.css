@@ -1773,6 +1773,10 @@ html.returning .lang {
     grid-column: 1;
     order: 9;
     margin-top: 8px;
+    /* Read as the notes are: their size and leading. */
+    font-size: 17px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
   }
   .pr-shots > :nth-child(5) {
     order: 8;
