@@ -167,7 +167,7 @@ export const projects = [
             text: 'The way in is browsing, with scenes in a grid you scroll *like a moodboard*, with search for when you already know what you want. A catalogue wide enough that everyone can find *the scene that fits their style*, instead of a pack picked by someone else.',
           },
           {
-            heading: 'An editor for the last mile',
+            heading: 'An editor for the final touches',
             text: 'The editor does two jobs. One, still internal, is *creating* the catalogue’s mockups. The other is yours. You *drop your design in* and tune it to your taste, from *reflections* and *brightness* to the *colours* of the scene, recoloured with one picked from the photo.',
           },
           {
@@ -181,18 +181,54 @@ export const projects = [
       frontend: {
         tags: 'Web Platform · Front-end',
         role: 'Front-end development',
-        intro:
-          'A Pinterest of mockups, with a catalogue to browse, a place to drop your design into a scene, and a full-quality download.',
-        sections: [
+        // Lo mismo que la de producto (la grabación arriba, muestras con notas
+        // entre ellas), más breve: tres muestras y tres notas (`layout: 'brief'`).
+        image: '/projects/mockp-flow-poster.bd8961b5.jpg',
+        video: '/projects/mockp-flow.b4f73e7b.mp4',
+        ratio: 1600 / 988,
+        layout: 'brief',
+        shots: [
           {
-            heading: 'The stack',
-            text: 'A *React + TypeScript* front-end built with *Vite*, *Supabase* as the backend and *Stripe* as the payment gateway.',
+            parallax: true,
+            video: '/projects/mockp-hands-wide.69874c69.mp4',
+            image: '/projects/mockp-hands-wide-poster.95708d63.jpg',
+            width: 1600,
+            height: 1334,
+            alt: 'Browsing mockups on mockp.com on a phone held in both hands',
           },
           {
-            heading: 'Browse, design, download',
-            text: 'The front-end carries the whole flow, from a *catalogue you browse like a moodboard*, to a mockup where you *drop your design in* and the *full-quality download* at the end.',
+            video: '/projects/mockp-editing.827df528.mp4',
+            image: '/projects/mockp-editing-poster.a4eff15c.jpg',
+            width: 1440,
+            height: 1080,
+            alt: 'Tuning the reflections, brightness and sofa colour of a mockup in the Mockp editor',
+          },
+          {
+            video: '/projects/mockp-hand.5b63b44f.mp4',
+            image: '/projects/mockp-hand-poster.8235c421.jpg',
+            width: 1440,
+            height: 1080,
+            alt: 'Scrolling Mockp’s pricing and questions on a phone held in hand',
           },
         ],
+        introLabel: 'The build',
+        intro:
+          'I built Mockp end to end, with a *React + TypeScript* front-end on *Vite*, *Supabase* behind it and *Stripe* for the plans. The work was making a catalogue, an editor and a 4K download feel like *one product* in the browser.',
+        notes: [
+          {
+            heading: 'A catalogue to scroll',
+            text: 'Scenes come in a grid you scroll *like a moodboard*, with search for when you already know what you want, and it works the same on a phone as on a laptop.',
+          },
+          {
+            heading: 'An editor that answers live',
+            text: 'The editor places your design on the scene and every control redraws it as you move it, from *glass and reflection* to the screen’s *brightness, contrast and saturation* and the *colour of the scene*. Then it downloads in 4K.',
+          },
+          {
+            heading: 'Plans through Stripe',
+            text: 'Paying runs through *Stripe*, with three plans that set how many downloads you get a day, five for free, twenty with Plus and no limit with Studio.',
+          },
+        ],
+        sections: [],
       },
     },
     es: {
@@ -238,7 +274,7 @@ export const projects = [
               text: 'Se entra explorando, con escenas en una cuadrícula que recorres *como un moodboard*, con búsqueda para cuando ya sabes lo que quieres. Un catálogo tan amplio que cada persona encuentre *la escena que encaja con su estilo*, en lugar de un pack elegido por otro.',
             },
             {
-              heading: 'Un editor para el último tramo',
+              heading: 'Un editor para los últimos retoques',
               text: 'El editor hace dos trabajos. Uno, todavía interno, es *crear* los mockups del catálogo. El otro es tuyo. *Colocas tu diseño* y lo ajustas a tu gusto, desde los *reflejos* y el *brillo* hasta los *colores* de la escena, recoloreada con uno tomado de la foto.',
             },
             {
@@ -251,18 +287,29 @@ export const projects = [
         frontend: {
           tags: 'Plataforma web · Front-end',
           role: 'Desarrollo front-end',
+          shots: [
+            { alt: 'Explorando mockups en mockp.com en un móvil sujeto con las dos manos' },
+            { alt: 'Ajustando los reflejos, el brillo y el color del sofá de un mockup en el editor de Mockp' },
+            { alt: 'Recorriendo los precios y las preguntas de Mockp en un móvil en la mano' },
+          ],
+          introLabel: 'Lo técnico',
           intro:
-            'Un Pinterest de mockups, con un catálogo para explorar, un sitio donde colocar tu diseño en una escena y una descarga a máxima calidad.',
-          sections: [
+            'Construí Mockp de principio a fin, con un front-end en *React + TypeScript* sobre *Vite*, *Supabase* detrás y *Stripe* para los planes. El trabajo era que un catálogo, un editor y una descarga en 4K se sintieran como *un solo producto* en el navegador.',
+          notes: [
             {
-              heading: 'El stack',
-              text: 'Un front-end en *React + TypeScript* construido con *Vite*, *Supabase* como backend y *Stripe* como pasarela de pago.',
+              heading: 'Un catálogo para recorrer',
+              text: 'Las escenas llegan en una cuadrícula que recorres *como un moodboard*, con búsqueda para cuando ya sabes lo que quieres, y funciona igual en un móvil que en un portátil.',
             },
             {
-              heading: 'Explorar, diseñar, descargar',
-              text: 'El front-end lleva todo el flujo, desde un *catálogo que recorres como un moodboard* hasta un mockup donde *colocas tu diseño* y la *descarga a máxima calidad* al final.',
+              heading: 'Un editor que responde al momento',
+              text: 'El editor coloca tu diseño en la escena y cada control la redibuja mientras lo mueves, desde el *cristal y los reflejos* hasta el *brillo, el contraste y la saturación* de la pantalla y el *color de la escena*. Después se descarga en 4K.',
+            },
+            {
+              heading: 'Planes con Stripe',
+              text: 'El pago va por *Stripe*, con tres planes que marcan cuántas descargas tienes al día, cinco gratis, veinte con Plus y sin límite con Studio.',
             },
           ],
+          sections: [],
         },
       },
     },
@@ -345,6 +392,12 @@ export const projects = [
 
 // The project as seen from one category: its `as[lens]` over the general version.
 export const lensed = (p, lens) => (lens && p.as?.[lens] ? { ...p, ...p.as[lens] } : p)
+
+// Whether a project, seen from a category, is laid out as a case study (one
+// centred column that scrolls): every Product Design version, and any other
+// version that brings its own sample shots.
+export const flows = (p, lens) =>
+  !!lens && !!p.category?.includes(lens) && (lens === 'product' || !!lensed(p, lens).shots)
 
 export const site = {
   name: 'Adrián García',

@@ -790,6 +790,67 @@ mark {
   padding: 0;
 }
 
+/* A brief case study (`layout: 'brief'`, three shots): the large video first,
+   across the page, its note under it on the right (name on the third column,
+   text on the fourth); the editor's video on the left over three columns, its
+   note under it (text on the left, name on the third); the last video on the
+   right with its note beside it on the left at its foot, and the facts under
+   that video, on columns 3–4 as on About. */
+.pr-shots.is-brief > :nth-child(1) {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  width: auto;
+  margin-top: 0;
+}
+
+.pr-shots.is-brief > :nth-child(2) {
+  grid-row: 3;
+  grid-column: 1 / span 3;
+  width: auto;
+  margin-top: clamp(48px, 9svh, 112px);
+}
+
+.pr-shots.is-brief > :nth-child(3) {
+  grid-row: 5;
+  grid-column: 3 / span 2;
+  margin-top: clamp(48px, 9svh, 112px);
+}
+
+.pr-shots.is-brief > .pr-note.n1 {
+  grid-row: 2;
+  grid-column: 3 / span 2;
+  margin-top: clamp(24px, 4svh, 40px);
+  row-gap: 0;
+}
+
+.pr-shots.is-brief > .pr-note.n1 p {
+  grid-row: 1;
+  grid-column: 2;
+  max-width: none;
+}
+
+/* Its notes are the grid's fourth and fifth children, where the product
+   version has shots: they keep a note's place, not a shot's. */
+.pr-shots.is-brief > .pr-note.n2 {
+  grid-row: 4;
+  grid-column: 1 / span 3;
+  margin-top: clamp(24px, 4svh, 40px);
+}
+
+.pr-shots.is-brief > .pr-note.n3 {
+  grid-row: 5;
+  grid-column: 1 / span 2;
+  align-self: end;
+  margin-top: 0;
+}
+
+.pr.is-flow .pr-shots.is-brief > .pr-facts {
+  grid-row: 6;
+  grid-column: 3 / span 2;
+  align-self: start;
+  margin-top: clamp(24px, 4svh, 40px);
+}
+
 /* Sections: the name on the first column, the text over the next two. */
 .pr.is-flow .pr-block {
   grid-template-columns: repeat(4, 1fr);
@@ -914,6 +975,23 @@ mark {
   }
   .pr-note.n3 p {
     grid-column: 2 / span 2;
+  }
+}
+
+/* The brief version: there the first note is the one beside its name on the
+   fourth column, so it takes the extra column; the third stays on the left. */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .pr-shots.is-brief > .pr-note.n1 {
+    grid-column: 2 / span 3;
+  }
+  .pr-shots.is-brief > .pr-note.n1 p {
+    grid-column: 2 / span 2;
+  }
+  .pr-shots.is-brief > .pr-note.n3 {
+    grid-column: 1 / span 2;
+  }
+  .pr-shots.is-brief > .pr-note.n3 p {
+    grid-column: 2;
   }
 }
 
@@ -1667,16 +1745,25 @@ html.returning .lang {
     grid-template-columns: 1fr;
     row-gap: 14px;
   }
-  /* The problem is the case's thesis: at the lead's size, a clear step above
-     the notes, so the page opens on what it argues. */
+  /* One reading size on a phone, as one on a desktop, and a generous one:
+     the problem, every name, every note, the site's address and the facts
+     all at 20px (--read). */
+  .pr.is-flow {
+    --read: 20px;
+    --read-lh: 1.35;
+    --read-ls: -0.015em;
+  }
   .pr.is-flow .pr-lead {
     grid-column: 1;
-    font-size: 20px;
-    line-height: 1.32;
-    letter-spacing: -0.015em;
+    font-size: var(--read);
+    line-height: var(--read-lh);
+    letter-spacing: var(--read-ls);
   }
   .pr-url {
     grid-column: 1;
+    font-size: var(--read);
+    line-height: var(--read-lh);
+    letter-spacing: var(--read-ls);
   }
   /* The name above its paragraph, as the sections do on a phone. */
   .pr-about-label {
@@ -1699,9 +1786,8 @@ html.returning .lang {
      together reads together. The shots alternate in scale and edge, so the
      work leads and the column never repeats itself: the laptop tall and
      bled to the right edge, the icon small and square at the left edge, the
-     hands across the whole screen, the editor framed by the margins (its
-     interface has to be read), the plans tall and across the screen to
-     close. Bleeding shots reach past the margins into the screen's edge
+     hands tall across the whole screen, the editor across it too, the plans
+     tall and across the screen to close. Bleeding shots reach past the margins into the screen's edge
      (.pr clips them). */
   .pr-shots {
     grid-template-columns: 1fr;
@@ -1742,8 +1828,10 @@ html.returning .lang {
     margin-left: calc(var(--gutter) * -1);
     order: 4;
   }
+  /* The hands, taller than they are wide: the video covers the window and
+     still pans through it (Shot). */
   .pr-shot.is-parallax {
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 4 / 5;
   }
   .pr-note,
   .pr-note.n1,
@@ -1777,7 +1865,10 @@ html.returning .lang {
   .pr-note.n3 {
     order: 5;
   }
+  /* The editor across the screen too, edge to edge like the others. */
   .pr-shots > :nth-child(4) {
+    width: calc(100% + var(--gutter) * 2);
+    margin-left: calc(var(--gutter) * -1);
     order: 6;
   }
   .pr-note.n4 {
@@ -1798,15 +1889,79 @@ html.returning .lang {
     order: 9;
     margin-top: 20px;
     /* Read as the notes are: their size and leading. */
-    font-size: 17px;
-    line-height: 1.45;
-    letter-spacing: -0.01em;
+    font-size: var(--read);
+    line-height: var(--read-lh);
+    letter-spacing: var(--read-ls);
+  }
+  /* The brief version in the same chapters: the large video tall across the
+     screen, the editor across it, the plans tall across it; then the facts. */
+  .pr-shots.is-brief > :nth-child(1),
+  .pr-shots.is-brief > :nth-child(3) {
+    grid-row: auto;
+    grid-column: 1;
+    justify-self: start;
+    width: calc(100% + var(--gutter) * 2);
+    margin: 64px 0 0 calc(var(--gutter) * -1);
+  }
+  .pr-shots.is-brief > :nth-child(1) {
+    margin-top: 0;
+    aspect-ratio: 4 / 5;
+  }
+  .pr-shots.is-brief > :nth-child(2) {
+    grid-row: auto;
+    grid-column: 1;
+    justify-self: start;
+    width: calc(100% + var(--gutter) * 2);
+    margin: 64px 0 0 calc(var(--gutter) * -1);
+  }
+  .pr-shots.is-brief > :nth-child(3) {
+    aspect-ratio: 4 / 5;
+  }
+  .pr-shots.is-brief > :nth-child(3) > * {
+    object-position: 58% 50%;
+  }
+  .pr-shots.is-brief > .pr-note.n1,
+  .pr-shots.is-brief > .pr-note.n2,
+  .pr-shots.is-brief > .pr-note.n3 {
+    grid-row: auto;
+    grid-column: 1;
+    justify-self: stretch;
+    width: auto;
+    aspect-ratio: auto;
+    margin: 16px 0 0;
+    row-gap: 6px;
+  }
+  .pr-shots.is-brief > .pr-note.n1 {
+    order: 1;
+  }
+  .pr-shots.is-brief > .pr-note.n2 {
+    order: 3;
+  }
+  .pr-shots.is-brief > .pr-note.n1 p,
+  .pr-shots.is-brief > .pr-note.n3 p {
+    grid-row: auto;
+    grid-column: 1;
+  }
+  .pr.is-flow .pr-shots.is-brief > .pr-facts {
+    grid-row: auto;
+    grid-column: 1;
+    margin-top: 20px;
   }
   /* Every step's name at the description's size, so name and text read as
      one voice on a phone. */
+  .pr.is-flow .pr-about-label,
+  .pr.is-flow .pr-note h2,
+  .pr.is-flow .pr-block h2,
+  .pr.is-flow .pr-note p,
+  .pr.is-flow .pr-block p,
+  .pr.is-flow .pr-facts {
+    font-size: var(--read);
+    line-height: var(--read-lh);
+    letter-spacing: var(--read-ls);
+  }
   .pr-about-label,
   .pr-note h2,
-  .pr.is-flow .pr-block h2 {
+  .pr-block h2 {
     font-size: 17px;
     line-height: 1.45;
     letter-spacing: -0.01em;

@@ -6,7 +6,7 @@ import NotFound from './NotFound.jsx'
 import { syncBarHeight } from './bar.js'
 import { createHang } from './hang.js'
 import { marked } from './marked.jsx'
-import { categories, projects, site } from './projects.js'
+import { categories, flows, projects, site } from './projects.js'
 import { localize, switchLang, useLang, useT } from './i18n.js'
 
 const fromPath = () => {
@@ -220,8 +220,8 @@ function Site() {
     return () => ro.disconnect()
   }, [])
 
-  // Product design pages keep only the back arrow up top; the title takes the row.
-  const flowPage = view && filter === 'product' && projects[view.index].category?.includes('product')
+  // Case-study pages keep only the back arrow up top; the title takes the row.
+  const flowPage = view && flows(projects[view.index], filter === 'all' ? null : filter)
   const pageClass = ['page', view && 'is-away', view && !closing && 'cards-out'].filter(Boolean).join(' ')
 
   return (

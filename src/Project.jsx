@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Media } from './Carousel.jsx'
-import { lensed, projects } from './projects.js'
+import { flows, lensed, projects } from './projects.js'
 import { localize, useLang, useT } from './i18n.js'
 import { syncBarHeight } from './bar.js'
 import { smoothScroll } from './smooth.js'
@@ -128,7 +128,10 @@ function Shot({ s }) {
       const b = { left: r.left - dx, top: r.top - dy, bottom: r.bottom - dy, width: r.width, height: r.height }
       const p = still ? 0.5 : Math.min(1, Math.max(0, (innerHeight - b.top) / (innerHeight + b.height)))
       if (s.parallax) {
-        const h = b.width / (s.width / s.height)
+        // The media at its own height, or, in a window taller than that (a
+        // phone), cropped at the sides so it covers the window and still has
+        // a third of its height to pan through.
+        const h = Math.max(b.width / (s.width / s.height), b.height * 1.3)
         inner.style.height = `${h}px`
         inner.style.transform = `translate3d(0, ${-Math.max(0, h - b.height) * p}px, 0)`
         if (still) return
@@ -204,7 +207,7 @@ export default function Project({ index, order, lens, from, closing, onClosed, o
   const t = useT()
   const seen = (i) => lensed(localize(projects[i], lang), projects[i].category?.includes(lens) ? lens : null)
   const p = seen(shown)
-  const flow = projects[shown].category?.includes(lens) && lens === 'product'
+  const flow = flows(projects[shown], lens)
   // The slot takes the shape of the media on its way in (it follows `index`).
   const ratio = seen(index).ratio ?? 4 / 5
   const next = order[(order.indexOf(shown) + 1) % order.length]
@@ -555,7 +558,7 @@ export default function Project({ index, order, lens, from, closing, onClosed, o
               {/* Sample shots, scattered over the page's grid; they come and go
                   whole with the project that has them. */}
               {flow && p.shots && (
-                <div key="shots" {...sw} {...rv(4, 'pr-shots')}>
+                <div key="shots" {...sw} {...rv(4, p.layout ? `pr-shots is-${p.layout}` : 'pr-shots')}>
                   {p.shots.map((s, i) => (
                     <Shot key={i} s={s} />
                   ))}
