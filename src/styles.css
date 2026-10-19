@@ -1736,6 +1736,12 @@ html.returning .lang {
   .pr.is-flow .pr-inner {
     padding: 0;
   }
+  /* The recording opens the page tall, 4:5, and edge to edge like the shots
+     below it (cropped to the middle of the site; .pr clips the overhang). */
+  .pr.is-flow .pr-slot {
+    width: 100vw;
+    height: calc(100vw * 5 / 4);
+  }
   .pr.is-flow .pr-sheet {
     padding-top: 0;
   }
@@ -1743,14 +1749,14 @@ html.returning .lang {
      under it on the right; facts and sections across the page. */
   .pr-about {
     grid-template-columns: 1fr;
-    row-gap: 14px;
+    row-gap: 24px;
   }
   /* One reading size on a phone, as one on a desktop, and a generous one:
      the problem, every name, every note, the site's address and the facts
      all at 19px (--read). */
   .pr.is-flow {
     --read: 19px;
-    --read-lh: 1.35;
+    --read-lh: 1.42;
     --read-ls: -0.015em;
   }
   .pr.is-flow .pr-lead {
@@ -1769,7 +1775,7 @@ html.returning .lang {
   .pr-about-label {
     grid-column: 1;
     grid-row: 1;
-    margin-bottom: -8px;
+    margin-bottom: -16px;
   }
   .pr.is-flow .pr-facts {
     margin-left: 0;
@@ -1782,7 +1788,8 @@ html.returning .lang {
     grid-column: 1;
   }
   /* One column read as chapters: each shot with its note close under it
-     (16px), and a long breath before the next (64px), so what belongs
+     (24px, the name 8px over its text), and a long breath before the next
+     (96px), so what belongs
      together reads together. The shots alternate in scale and edge, so the
      work leads and the column never repeats itself: the laptop tall and
      bled to the right edge, the icon small and square at the left edge, the
@@ -1792,12 +1799,12 @@ html.returning .lang {
   .pr-shots {
     grid-template-columns: 1fr;
     row-gap: 0;
-    margin-top: 56px;
+    margin-top: 96px;
   }
   .pr-shot {
     grid-row: auto;
     grid-column: 1;
-    margin-top: 64px;
+    margin-top: 96px;
   }
   .pr-shots > :nth-child(1) {
     grid-column: 1;
@@ -1815,7 +1822,7 @@ html.returning .lang {
   .pr-shots > :nth-child(5) {
     grid-row: auto;
     grid-column: 1;
-    margin-top: 64px;
+    margin-top: 96px;
   }
   .pr-shots > :nth-child(2) {
     justify-self: start;
@@ -1840,9 +1847,9 @@ html.returning .lang {
   .pr-note.n4 {
     grid-row: auto;
     grid-column: 1;
-    margin: 16px 0 0;
+    margin: 24px 0 0;
     grid-template-columns: 1fr;
-    gap: 6px;
+    gap: 8px;
   }
   .pr-note h2,
   .pr-note p,
@@ -1887,7 +1894,7 @@ html.returning .lang {
     grid-row: auto;
     grid-column: 1;
     order: 9;
-    margin-top: 20px;
+    margin-top: 28px;
     /* Read as the notes are: their size and leading. */
     font-size: var(--read);
     line-height: var(--read-lh);
@@ -1901,7 +1908,7 @@ html.returning .lang {
     grid-column: 1;
     justify-self: start;
     width: calc(100% + var(--gutter) * 2);
-    margin: 64px 0 0 calc(var(--gutter) * -1);
+    margin: 96px 0 0 calc(var(--gutter) * -1);
   }
   .pr-shots.is-brief > :nth-child(1) {
     margin-top: 0;
@@ -1912,7 +1919,7 @@ html.returning .lang {
     grid-column: 1;
     justify-self: start;
     width: calc(100% + var(--gutter) * 2);
-    margin: 64px 0 0 calc(var(--gutter) * -1);
+    margin: 96px 0 0 calc(var(--gutter) * -1);
   }
   .pr-shots.is-brief > :nth-child(3) {
     aspect-ratio: 4 / 5;
@@ -1928,8 +1935,8 @@ html.returning .lang {
     justify-self: stretch;
     width: auto;
     aspect-ratio: auto;
-    margin: 16px 0 0;
-    row-gap: 6px;
+    margin: 24px 0 0;
+    row-gap: 8px;
   }
   .pr-shots.is-brief > .pr-note.n1 {
     order: 1;
@@ -1945,7 +1952,7 @@ html.returning .lang {
   .pr.is-flow .pr-shots.is-brief > .pr-facts {
     grid-row: auto;
     grid-column: 1;
-    margin-top: 20px;
+    margin-top: 28px;
   }
   /* Every step's name at the description's size, so name and text read as
      one voice on a phone. */
