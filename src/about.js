@@ -25,4 +25,27 @@ export const about = {
     { place: 'IBM', role: 'UX Design Fundamentals', note: '12 h' },
     { place: 'Anthropic', role: 'Claude 101', note: '3 h' },
   ],
+  // Traducción (i18n.js): lo que no esté aquí sale en inglés.
+  es: {
+    title: 'Desarrollador front-end con formación en diseño de producto.',
+    lead: 'Construyo interfaces cuidando tanto la *implementación técnica* como la *experiencia* de las personas que acaban usándolas.',
+    facts: [
+      { label: 'Vivo en' },
+      { label: 'Idiomas', value: 'Español (nativo), valenciano (C1), inglés (B2)' },
+    ],
+    skills: ['JavaScript', 'TypeScript', 'React', 'Next.js', 'HTML', 'CSS', 'Java', 'Supabase', 'Git/GitHub', 'Figma', 'Diseño UX/UI'],
+    education: [
+      {
+        dates: '2026 – Actualidad',
+        role: 'Grado en Ingeniería Informática',
+        note: 'Lo compagino con mi trabajo profesional en diseño de producto.',
+      },
+      { role: 'CFGS en Desarrollo de Aplicaciones Multiplataforma (DAM)' },
+    ],
+    certificates: [
+      { role: 'Certificado de Diseño UX de Google', note: 'En curso · 4 de 8 cursos · 130 h' },
+      {},
+      {},
+    ],
+  },
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 // Feel. Lower LERP = more glide.
 const LERP = 0.07
@@ -20,13 +20,59 @@ const wrap = (min, max, v) => {
 const INTRO = 1.3
 const INTRO_LERP = 0.032 // calmer glide for the intro only
 
-export default function Carousel({ items, onOpen, locked, intro }) {
+// Changing the set (the filter): the cards fall, nearest the left first, and
+// the new ones rise in their place.
+const FALL = 420 // ms, matches .track.is-falling
+const STAGGER = 0.16 // s across the screen
+
+// Staggers the cards left to right by where they are on screen.
+const stagger = (track) =>
+  [...track.children].forEach((c) => {
+    const x = Math.min(Math.max(c.getBoundingClientRect().left / innerWidth, 0), 1)
+    c.style.setProperty('--delay', `${x * STAGGER}s`)
+  })
+
+// `items` carry their index in `projects` as `i` (the project page finds its
+// card by it). `loop`: the strip wraps around; off, it's a plain row that stops
+// at both ends, so a short set never repeats.
+export default function Carousel({ items: wanted, loop, onOpen, locked, intro }) {
   const trackRef = useRef(null)
   // Position outlives the engine, which restarts when the copy count changes.
   const posRef = useRef(null)
   const lockedRef = useRef(locked)
   lockedRef.current = locked
   const [repeat, setRepeat] = useState(2)
+  // What's on the strip; it trails `wanted` while the old cards fall.
+  const [set, setSet] = useState({ items: wanted, loop })
+  const { items } = set
+  const [phase, setPhase] = useState(null) // 'falling' | 'rising' | null
+  const swapped = useRef(false) // once true, the intro's late captions are over
+
+  useEffect(() => {
+    // Back to what's on the strip before it was swapped: the cards rise again.
+    if (wanted === set.items) return setPhase((ph) => (ph === 'falling' ? null : ph))
+    const track = trackRef.current
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+    stagger(track)
+    setPhase('falling')
+    const id = setTimeout(() => {
+      posRef.current = { current: 0, target: 0 }
+      swapped.current = true
+      setSet({ items: wanted, loop })
+      setPhase('rising')
+    }, reduce ? 0 : FALL + STAGGER * 1000)
+    return () => clearTimeout(id)
+  }, [wanted])
+
+  // The new cards are mounted below the edge (no transition), then let go.
+  useLayoutEffect(() => {
+    if (phase !== 'rising') return
+    const track = trackRef.current
+    stagger(track)
+    track.offsetWidth
+    let raf = requestAnimationFrame(() => (raf = requestAnimationFrame(() => setPhase(null))))
+    return () => cancelAnimationFrame(raf)
+  }, [phase])
 
   // Enough copies that the loop never shows its seam.
   useEffect(() => {
@@ -40,6 +86,8 @@ export default function Carousel({ items, onOpen, locked, intro }) {
     addEventListener('resize', fit)
     return () => removeEventListener('resize', fit)
   }, [items.length])
+  // Without the loop there's nothing to hide: one copy.
+  const copies = set.loop ? repeat : 1
 
   useEffect(() => {
     const track = trackRef.current
@@ -49,15 +97,18 @@ export default function Carousel({ items, onOpen, locked, intro }) {
     // Mouse: hover drives the card. Touch: the centered card does.
     const byHover = matchMedia('(hover: hover)').matches
 
-    let step, cardW, total, vw, lefts, growMax
+    const loop = set.loop
+    let step, cardW, total, vw, lefts, growMax, end
     const measure = () => {
       // Growth fills the headroom above the cards and never reaches the name.
       growMax = Math.min(GROW, (track.clientHeight - cards[0].offsetHeight - 6) / cards[0].offsetHeight)
       lefts = cards.map((c) => c.offsetLeft)
-      step = lefts[1] - lefts[0]
       cardW = cards[0].offsetWidth
+      step = cards.length > 1 ? lefts[1] - lefts[0] : cardW
       total = step * cards.length
       vw = innerWidth
+      // Without the loop: as far as the last card meeting the right gutter.
+      end = Math.max(0, lefts.at(-1) + cardW + lefts[0] - vw)
     }
     measure()
 
@@ -173,7 +224,7 @@ export default function Carousel({ items, onOpen, locked, intro }) {
       const card = e.target.closest('.card')
       const i = cards.indexOf(card)
       if (i < 0) return
-      const p = wrap(-step, total - step, lefts[i] - current)
+      const p = loop ? wrap(-step, total - step, lefts[i] - current) : lefts[i] - current
       target = current + (p + cardW / 2 - vw / 2)
     }
 
@@ -201,6 +252,7 @@ export default function Carousel({ items, onOpen, locked, intro }) {
       const dt = Math.min((now - last) / 16.667, 4)
       last = now
 
+      if (!loop) target = Math.min(Math.max(target, 0), end)
       const prev = current
       if (gliding && (Math.abs(target - posRef.current.target) > 0 || Math.abs(target - current) < 1)) gliding = false
       const lerp = reduce ? 0.25 : gliding ? INTRO_LERP : LERP
@@ -233,7 +285,7 @@ export default function Carousel({ items, onOpen, locked, intro }) {
       const scale = 1 - SCALE_DROP * e
       let nearest = 0, best = Infinity
 
-      const ps = cards.map((_, i) => wrap(-step, total - step, lefts[i] - current))
+      const ps = cards.map((_, i) => (loop ? wrap(-step, total - step, lefts[i] - current) : lefts[i] - current))
       for (let i = 0; i < cards.length; i++) {
         const p = ps[i]
         const fromCenter = p + cardW / 2 - vw / 2
@@ -274,19 +326,19 @@ export default function Carousel({ items, onOpen, locked, intro }) {
       removeEventListener('keydown', onKey)
       removeEventListener('resize', onResize)
     }
-  }, [items, repeat, onOpen])
+  }, [set, copies, onOpen])
 
-  const list = Array.from({ length: repeat }, () => items).flat()
+  const list = Array.from({ length: copies }, () => items).flat()
 
   return (
-    <div className="track" ref={trackRef}>
+    <div className={['track', phase && `is-${phase}`, swapped.current && 'was-swapped'].filter(Boolean).join(' ')} ref={trackRef}>
       {list.map((p, i) => {
         const clone = i >= items.length
         return (
           <a
-            key={i}
+            key={`${p.slug}-${i}`}
             className="card"
-            data-i={i % items.length}
+            data-i={p.i}
             href={`/proyecto/${p.slug}`}
             draggable={false}
             aria-hidden={clone || undefined}

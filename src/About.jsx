@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { about } from './about.js'
+import { about as en } from './about.js'
+import { localize, useLang, useT } from './i18n.js'
 import { site } from './projects.js'
 import { marked } from './marked.jsx'
 import { smoothScroll } from './smooth.js'
@@ -32,12 +33,14 @@ function Block({ title, i, children }) {
 }
 
 export default function About({ active, rootRef }) {
+  const about = localize(en, useLang())
+  const t = useT()
   const scrollRef = useRef(null)
   useEffect(() => smoothScroll(scrollRef.current, window), [])
 
   return (
     <div className={active ? 'ab is-on' : 'ab'} ref={rootRef} inert={active ? undefined : true}>
-      <article className="ab-scroll" ref={scrollRef} aria-label="About">
+      <article className="ab-scroll" ref={scrollRef} aria-label={t.about}>
         <div className="ab-intro">
           <h1 {...at(0)}>{about.title}</h1>
           <div className="ab-row">
@@ -52,7 +55,7 @@ export default function About({ active, rootRef }) {
                 </div>
               ))}
               <div>
-                <dt>Email</dt>
+                <dt>{t.email}</dt>
                 <dd>
                   <a className="link" href={`mailto:${site.email}`}>
                     {site.email}
@@ -64,7 +67,7 @@ export default function About({ active, rootRef }) {
         </div>
 
         <section className="ab-block">
-          <h2 {...at(9)}>Skills</h2>
+          <h2 {...at(9)}>{t.skills}</h2>
           <ul {...at(10, 'ab-pills')}>
             {about.skills.map((s) => (
               <li key={s}>{s}</li>
@@ -72,20 +75,20 @@ export default function About({ active, rootRef }) {
           </ul>
         </section>
 
-        <Block title="Education" i={11}>
+        <Block title={t.education} i={11}>
           {about.education.map((e) => (
             <Entry key={e.place} e={e} i={12} />
           ))}
         </Block>
 
-        <Block title="Certificates" i={12}>
+        <Block title={t.certificates} i={12}>
           {about.certificates.map((e) => (
             <Entry key={e.role} e={{ ...e, dates: e.place, place: e.role, role: null }} i={13} />
           ))}
         </Block>
 
         <footer className="ab-close ar" style={{ '--at': 0.75 }}>
-          <p className="ab-close-label">Say hello</p>
+          <p className="ab-close-label">{t.sayHello}</p>
           <a className="ab-mail" href={`mailto:${site.email}`}>
             <mark>{site.email}</mark>
           </a>

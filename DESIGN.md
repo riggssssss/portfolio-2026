@@ -34,6 +34,12 @@ typography:
     fontWeight: 400
     lineHeight: 1.2
     letterSpacing: "-0.02em"
+  reading:
+    fontFamily: "Figtree Variable, system-ui, sans-serif"
+    fontSize: "clamp(1.0625rem, 1.15vw, 1.25rem)"
+    fontWeight: 400
+    lineHeight: 1.45
+    letterSpacing: "-0.01em"
   body:
     fontFamily: "Figtree Variable, system-ui, sans-serif"
     fontSize: "15px"
@@ -78,7 +84,7 @@ components:
 
 This is the desk of a designer who writes code: a warm grey sheet of paper, three pencils of the same grey in different pressures, and one highlighter. Nothing on the desk is decorative. What matters is marked by hand, in lime, and everything else stays in pencil. The work itself (photographs and videos of real products) is the only colour that isn't a marker.
 
-The page is mostly empty on purpose. The upper area holds a few lines of small type: the bio, the menu, the local time, the signature. The lower area holds the work strip. Density is low and the scale contrast is high: 15px interface type next to 90px serif statements, with nothing in between pretending to be important.
+The page is mostly empty on purpose. The upper area holds a few lines of small type: the bio, the menu, the language switch, the signature. The lower area holds the work strip. Density is low and the scale contrast is high: 15px interface type next to 90px serif statements, with nothing in between pretending to be important.
 
 The motion is the craft being sold, so it follows the same rule as the desk: continuous, physical, never decorative. Things glide with inertia, fall with gravity and settle, and an element is recycled rather than rebuilt. A flicker, a jump or two things overlapping breaks the illusion that this is one continuous object, and that is treated as a defect.
 
@@ -104,7 +110,7 @@ A monochrome paper-and-pencil palette with a single fluorescent marker.
 ### Neutral
 - **Paper:** the page ground everywhere, and the site's "white". Nothing sits on pure white.
 - **Pencil Dark (`ink`):** content. Titles, the signature, project leads, body values, and the active card's name.
-- **Pencil Mid (`ink-2`):** interface. The menu, the clock, tags, section links, and the pills' text.
+- **Pencil Mid (`ink-2`):** interface. The menu, tags, section links, and the pills' text.
 - **Pencil Light (`ink-3`):** whispers. The bio, "by", "Now building", fact labels, section headings, card names at rest, and the 404 code.
 - **Tile:** the ground of an image box before its picture lands, and the base of the loading skeleton.
 - **Rule:** hairline dividers between fact rows and the scrollbar thumb.
@@ -128,7 +134,7 @@ The three pencils are the same warm-neutral hue (OKLCH hue 100, chroma 0.004) at
 - **Headline** (Lora 400, clamp(2rem → 3.75rem), line-height 1): the project title, the next-project title, and the closing email on About.
 - **Signature** (Lora 400, clamp(1.5rem → 2.5rem), line-height 1): "Adrián García" on the home, baseline-aligned with "Now building" on the strip's edge. "by" before it is body size in Pencil Light.
 - **Lead** (Figtree 400, clamp(1.25rem → 1.75rem), line-height 1.2, letter-spacing −0.02em, max 32ch): the project intro, the About lead and the 404 explanation. On phones the project section text is set at a reading size instead (Figtree 400, 17px, line-height 1.45) under 15px Pencil Light headings: the lead's tight leading is for one sentence, not paragraphs.
-- **Body** (Figtree 400, 15px, line-height 1.35): everything else, including the bio, menu, clock, card names, facts and section text on desktop. There is one size for all small type.
+- **Body** (Figtree 400, 15px, line-height 1.35): everything else, including the bio, menu, language switch, card names, facts and section text on desktop. There is one size for all small type.
 
 ### Named Rules
 **The One Small Size Rule.** All small type is 15px Figtree 400. Hierarchy among small things comes from the three pencils and from position, never from a 13px/14px/16px ladder or from bold.
@@ -141,7 +147,7 @@ The three pencils are the same warm-neutral hue (OKLCH hue 100, chroma 0.004) at
 
 The page is a sheet with one gutter (`clamp(16px, 1.6vw, 28px)`) on every edge, and the gap between the name and the strip is that same gutter.
 
-- **Home:** the upper area holds the header bar and, at its bottom edge, the signature line. The strip takes `58svh` at the bottom. The header is a four-column grid: the bio spans columns 1–2 (max 62ch), the menu is in column 3 and the clock in column 4, right-aligned.
+- **Home:** the upper area holds the header bar and, at its bottom edge, the signature line. The strip takes `58svh` at the bottom. The header is a four-column grid: the bio spans columns 1–2 (max 62ch), the menu is in column 3 and the EN / ES switch in column 4, right-aligned (Pencil Light, the current language Pencil Dark, like the filter; on phones at the end of the menu's row, on the home only). Switching fades the page's words out and back.
 - **Project:** two fixed halves under the bar. The media fills the left half to the bottom gutter; the text column scrolls on the right. Its first screen holds the title, tags, lead and the facts table, sitting on the media's bottom edge. The sections start below the fold. Facts and sections use a 1fr / 2fr label/value grid.
 - **About and 404:** the statement sits low on the first screen, where the work would be. Rows reuse the bar's four columns, so the lead sits under the bio and the facts under the menu.
 - **Phone (≤760px):**
@@ -174,6 +180,17 @@ The signature component.
   - The hovered card grows into the headroom above (up to 10%) and pushes its neighbours aside.
   - The intro slides the strip in from the left on a slower glide.
 
+### Work Filter
+- **Place:** on the signature line, in the menu's column (on phones, its own line just above the name). "All" plus each category that has projects: Product Design, Front-end, Concept.
+- **Style:** words like the menu. Pencil Light at rest, Pencil Mid on hover, Pencil Dark when current. No marker: the lime stays for the menu and "Now building".
+- **Motion:** the cards fall, accelerating and staggered left to right, then the new set rises from below the edge with the card's own transition.
+- **Strip:** only "All" loops; a filtered set is a plain row that stops at both ends, so one or two projects never repeat.
+- **Next project:** walks the filtered set.
+- **In the address:** a chosen filter is kept as `?as=<category>` on the home and on any project opened from it ("All" leaves the address clean), so a reload, back and forward, or a shared link open the same version of the work.
+- **One role per page:** opened from a category, a project shows that category's version (`as` in `src/projects.js`), which speaks only of that role. From "All" it shows the general version.
+- **No colons and no em or double dashes in the copy,** in English or Spanish: sentences split, or joined with commas. Date ranges keep their en dash.
+- **Product Design pages are one centred column that scrolls as a normal page:** the menu hidden and only the back arrow up top, the title alone in the arrow's row (Lora 20–28px, no tags), at the far right on the page's gutter (mirroring the arrow and the landing's language switch), the media just below in its own proportions (`ratio`; 66vw on a wide page, never under 640px on a tablet, the gutters' width on a phone, and capped so it fits under the title on a short screen); scrolling, the content passes under the arrow, which floats over it with no ground of its own, then, in the landing's hierarchy (one small size, the three pencils by role, the lime on a few phrases, the bar's four columns): the opening paragraph, the case's problem (15px, Pencil Mid like every paragraph on this page, a step lighter than elsewhere so the media lead; key phrases marked; over the first two columns; 17px on phones) with its name (`introLabel`, Pencil Light) on the third column, the site's full URL where the landing's language switch sits (column 4, Pencil Light like the paragraph's name, on the description's first baseline; under it on phones), with the same space above and below the media. Under it, sample shots (`shots`) on the four columns: a picture top right across columns 3–4, a second, square picture on columns 1–2 at 80% of their width (60% on phones) from midway down it, and the largest, a second video on a row of its own across the page, in a window lower than the video (16:9, 3:2 on phones) where it pans with the scroll, its top edge as it comes in and its bottom edge as it leaves (`parallax`; held at the centre with reduced motion). The window itself comes up from below as it appears (15% of the screen, at most 160px, easing out) and is in place once its top has risen a third of the screen; from there it scrolls with the page. Every other shot moves too, by where it sits: one centred on the page (on phones, the videos across it) has its media a little larger than the box (×1.12), drifting down inside it slower than the page; one to a side glides in from that side (a tenth of its own width, 32–140px, from beyond the page's edge, which clips it) and eases into its place in the grid by the time it reaches the middle of the screen, never past it toward its neighbours, while its media, larger (×1.22), drifts inside it further than a centred one's. All still with reduced motion (on phones the videos run across the page and the two pictures are set right, then left, at 72%). `notes` sit among the shots, each under its own: the approach under the picture (columns 3–4), the first decision under the second picture (columns 1–2), the editor right under the large video (on the right, its name on column 3 and the text beside it on column 4; on tablets both a column further left), then its screen recording, 4:3 from the right of the window (the whole mockup and the settings), over columns 1–3, under it the plans (set as the editor's note), and last the pricing video across columns 3–4; every step's name on the third column, as the problem's, except the approach's text, which runs under its name across columns 3–4 for a paragraph's width (the notes use the page's columns as a subgrid; the first decision's text runs on columns 1–2 at the problem's width; each note after its shot, name above, on phones, where every step's name is set at the description's 17px). The facts sit among the shots, beside the last video on columns 1–2 at its foot, with no rules and the rows set close (label on column 1, value on column 2; after it on phones); a project without shots keeps them on columns 3–4 as on About. Then the sections, when there are any, with their name on column 1 and text over columns 2–3, written as a case study: the problem (the opening paragraph), the approach and the first decision (the notes), the rest of the decisions (each with its reason and what it gave up), and where it stands. The card still flies into the media's slot; when the category shows other media than the card (Mockp's screen recording, cropped inside the window so its corners are square), the card's picture fades into it during the flight, and back on the way home.
+
 ### Card → Project Transition
 - **Opening:** the card's media box flies (FLIP, WAAPI, `cubic-bezier(0.5, 0, 0.2, 1)`, 1050ms) into the project's media slot. The other cards fall out and away, nearest first.
 - **Closing:** the media flies back and the cards rise.
@@ -189,11 +206,11 @@ The page is recycled, not rebuilt.
 ### Navigation
 - **Style:** body type in Pencil Mid; the links are words, not buttons.
 - **Current page:** a permanent Highlighter Lime marker band under the link. The same band draws in from the left on hover.
-- **Back:** a bare arrow, 28–40px, at the menu's line, which nudges 5px left on hover.
+- **Back:** a bare arrow, 28–40px, at the menu's line, which nudges 5px left on hover. On touch its hit area is 44px, the glyph unmoved.
 
 ### Links and Marks
 - **Marked link:** the text sits on a lime marker band, and hover fills the whole line in lime ("Now building Mockp", "Back to the work").
-- **Plain link:** a hairline underline that draws in on hover, with a small ↗ arrow for external links.
+- **Plain link:** a hairline underline that draws in on hover, with a small ↗ arrow for external links: a square arrow, its head's two sides as long as the square's side and the shaft corner to corner.
 
 ### Facts Table
 Label/value rows separated by hairline Rules. Labels are Pencil Light and values Pencil Dark, both in body type.

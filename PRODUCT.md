@@ -34,16 +34,17 @@ The site is itself the proof of front-end craft. The motion (the inertial carous
 
 ## Capabilities and Constraints
 
-- Home layout pinned by the user: an upper area mostly empty (bio, menu, local time, name) and a horizontal project carousel below with smooth scroll, glide, and cards that shrink and spread with speed. Reference given by the user: brandonyasin.com.
+- Home layout pinned by the user: an upper area mostly empty (bio, menu, language, name) and a horizontal project carousel below with smooth scroll, glide, and cards that shrink and spread with speed. Reference given by the user: brandonyasin.com.
 - Only real projects. No demo or placeholder entries.
+- Projects are filed under categories (`category` in `src/projects.js`): Product Design, Front-end and Concept. **Concept** is interface design and prototyping that was never launched or built; it is shown as a concept, and the copy never says why it didn't go ahead.
 - Mobile is a first-class target: every change is designed and checked at phone width.
-- **Open decision:** the site is to become **bilingual (English + Spanish)**. The copy is English today, and the mechanism (selector, routes) is not decided yet.
+- **Bilingual (English + Spanish):** English by default. An EN / ES switch sits in the bar's corner on the home (at the end of the menu's row on phones); `?lang=es` opens it in Spanish (for links in a Spanish CV) and the choice is remembered. URLs don't change. Content is written in English with an `es` layer beside each piece (`src/i18n.js` merges it field by field); interface words live in `ui` in `src/i18n.js`.
 - **Open:** Beside's year, status and stack; Dakubo's stack and status (marked `confirmar` in `src/projects.js`).
 
 ## Brand Commitments
 
 - Name: Adrián García. Role: Front-end developer with a background in product design.
-- Based in Manises, Valencia; the local time is shown as Valencia.
+- Based in Manises, Valencia.
 - Voice: first person, plain, precise, with no hype. Key phrases are marked with the lime marker, never with bold.
 
 ## Evidence on Hand

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import About from './About.jsx'
 import Carousel from './Carousel.jsx'
 import Project from './Project.jsx'
@@ -6,7 +6,8 @@ import NotFound from './NotFound.jsx'
 import { syncBarHeight } from './bar.js'
 import { createHang } from './hang.js'
 import { marked } from './marked.jsx'
-import { projects, site } from './projects.js'
+import { categories, projects, site } from './projects.js'
+import { localize, switchLang, useLang, useT } from './i18n.js'
 
 const fromPath = () => {
   const slug = location.pathname.match(/^\/proyecto\/([^/]+)/)?.[1]
@@ -14,20 +15,39 @@ const fromPath = () => {
   return i < 0 ? null : i
 }
 const isAbout = () => location.pathname === '/about'
+// Each project with its index in `projects`; the filter shows a subset of them.
+const all = projects.map((p, i) => ({ ...p, i }))
+const filters = [{ key: 'all' }, ...categories.filter((c) => all.some((p) => p.category?.includes(c.key)))]
 // Anything that isn't the home, About or a project that exists.
 const isMissing = () => !/^\/?$/.test(location.pathname) && !isAbout() && fromPath() == null
+// The filter lives in the address (?as=product), on the home and on a project
+// opened from it, so a reload, back and forward, or a shared link show the
+// same version of the work.
+const lensFromUrl = () => {
+  const as = new URLSearchParams(location.search).get('as')
+  return filters.some((f) => f.key === as) ? as : 'all'
+}
+const withLens = (path, f) => (f && f !== 'all' ? `${path}?as=${f}` : path)
 
-function Clock({ leaving }) {
-  const fmt = () =>
-    new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: site.timeZone }).format(new Date())
-  const [time, setTime] = useState(fmt)
-  useEffect(() => {
-    const id = setInterval(() => setTime(fmt()), 10_000)
-    return () => clearInterval(id)
-  }, [])
+// EN / ES, words like the filter: the current one pressed harder.
+function Lang({ leaving }) {
+  const lang = useLang()
   return (
-    <span className={leaving ? 'clock is-leaving' : 'clock'}>
-      {site.city} <time>{time}</time>
+    <span className={leaving ? 'lang is-leaving' : 'lang'} role="group" aria-label={useT().language}>
+      {['en', 'es'].map((l) => (
+        <button key={l} type="button" lang={l} aria-pressed={lang === l} onClick={() => switchLang(l)}>
+          {l.toUpperCase()}
+        </button>
+      ))}
+    </span>
+  )
+}
+
+// The corner of the bar: the language.
+function Corner({ leaving }) {
+  return (
+    <span className="corner">
+      <Lang leaving={leaving} />
     </span>
   )
 }
@@ -39,24 +59,28 @@ export default function App() {
 
 // The bar as on About (menu up top, no bio), over the 404. Real links, see NotFound.
 function Missing() {
+  const s = localize(site, useLang())
   return (
     <>
       <NotFound />
       <header className="bar is-about">
-        <nav className="nav" aria-label="Principal">
-          {site.nav.map((l) => (
+        <nav className="nav" aria-label={useT().main}>
+          {s.nav.map((l) => (
             <a key={l.label} href={l.href}>
               {l.label}
             </a>
           ))}
         </nav>
-        <Clock />
+        <Corner />
       </header>
     </>
   )
 }
 
 function Site() {
+  const lang = useLang()
+  const t = useT()
+  const s = localize(site, lang)
   const [view, setView] = useState(() => {
     const i = fromPath()
     return i == null ? null : { index: i, from: null }
@@ -74,7 +98,8 @@ function Site() {
       aboutRef.current?.style.setProperty('--ap', p)
       // Fully away and still: the strip can't show a stray card on resize or re-layout.
       pageRef.current?.classList.toggle('is-hung', p === 1 && resting)
-      if (p === 0) setAboutOn(false)
+      // Only once home and still: going to About, p stays 0 while the pieces fall.
+      if (p === 0 && resting) setAboutOn(false)
     })
   )
   const firstHang = useRef(true)
@@ -87,6 +112,17 @@ function Site() {
   // The bio and the clock fade out, then leave the DOM while a project is open.
   const [bioGone, setBioGone] = useState(view != null || isAbout())
   const nowIndex = projects.findIndex((p) => p.slug === site.now)
+  const [filter, setFilter] = useState(lensFromUrl)
+  const lensRef = useRef(filter)
+  lensRef.current = filter
+  const pickFilter = (f) => {
+    setFilter(f)
+    history.replaceState(null, '', withLens(location.pathname, f))
+  }
+  const shown = useMemo(() => (filter === 'all' ? all : all.filter((p) => p.category?.includes(filter))), [filter])
+  // "Next project" walks the filtered set, unless the open project isn't in it
+  // (opened from "Now building"): then every project.
+  const order = view && !shown.some((p) => p.i === view.index) ? all : shown
   // Landing on the home page plays the intro; landing on a project doesn't.
   const [intro] = useState(() => view == null && !about)
   // The intro's staggered entrances stay put until the first project opens:
@@ -108,20 +144,20 @@ function Site() {
 
   const open = useCallback((i) => {
     setView({ index: i, from: { type: 'card' } })
-    history.pushState(null, '', `/proyecto/${projects[i].slug}`)
+    history.pushState(null, '', withLens(`/proyecto/${projects[i].slug}`, lensRef.current))
   }, [])
 
   const close = useCallback((push = true) => {
     setClosing(true)
-    if (push) history.pushState(null, '', '/')
+    if (push) history.pushState(null, '', withLens('/', lensRef.current))
   }, [])
 
   // Next project: the same page stays and recycles itself into the next one
   // (Project animates whenever its index changes).
   const next = () => {
-    const i = (view.index + 1) % projects.length
+    const i = order[(order.findIndex((p) => p.i === view.index) + 1) % order.length].i
     setView((v) => ({ ...v, index: i }))
-    history.pushState(null, '', `/proyecto/${projects[i].slug}`)
+    history.pushState(null, '', withLens(`/proyecto/${projects[i].slug}`, lensRef.current))
   }
 
   const onClosed = useCallback(() => {
@@ -139,12 +175,13 @@ function Site() {
   const goHome = () => {
     if (view) return close()
     aboutAfter.current = false
-    if (about) setAbout(false), history.pushState(null, '', '/')
+    if (about) setAbout(false), history.pushState(null, '', withLens('/', lensRef.current))
   }
 
   // Browser back/forward replay the same transitions.
   useEffect(() => {
     const onPop = () => {
+      if (!isAbout()) setFilter(lensFromUrl())
       const i = fromPath()
       if (i == null) {
         aboutAfter.current = isAbout()
@@ -159,7 +196,7 @@ function Site() {
     const onKey = (e) => {
       if (e.key !== 'Escape') return
       if (view && !closing) close()
-      else if (about) setAbout(false), history.pushState(null, '', '/')
+      else if (about) setAbout(false), history.pushState(null, '', withLens('/', lensRef.current))
     }
     addEventListener('popstate', onPop)
     addEventListener('keydown', onKey)
@@ -183,6 +220,8 @@ function Site() {
     return () => ro.disconnect()
   }, [])
 
+  // Product design pages keep only the back arrow up top; the title takes the row.
+  const flowPage = view && filter === 'product' && projects[view.index].category?.includes('product')
   const pageClass = ['page', view && 'is-away', view && !closing && 'cards-out'].filter(Boolean).join(' ')
 
   return (
@@ -190,11 +229,21 @@ function Site() {
       <main className={pageClass} ref={pageRef} inert={view || about ? true : undefined}>
         <section className="top">
           <h1 className="hero">
-            <span className="by">by</span> <span className="signature">{site.name}</span>
+            <span className="by">{t.by}</span> <span className="signature">{site.name}</span>
           </h1>
+          {/* Hidden until there are two categories to choose between. */}
+          {filters.length > 2 && (
+            <div className="filter" role="group" aria-label={t.filter}>
+              {filters.map((f) => (
+                <button key={f.key} type="button" aria-pressed={filter === f.key} onClick={() => pickFilter(f.key)}>
+                  {f.key === 'all' ? t.all : localize(f, lang).label}
+                </button>
+              ))}
+            </div>
+          )}
           {nowIndex >= 0 && (
             <p className="now">
-              Now building{' '}
+              {t.nowBuilding}{' '}
               <a href={`/proyecto/${site.now}`} onClick={(e) => (e.preventDefault(), open(nowIndex))}>
                 <mark>{projects[nowIndex].title}</mark>
               </a>
@@ -202,19 +251,19 @@ function Site() {
           )}
         </section>
 
-        <section className="work" aria-label="Proyectos">
-          <Carousel items={projects} onOpen={open} locked={!!view || about} intro={intro} />
+        <section className="work" aria-label={t.work}>
+          <Carousel items={shown} loop={filter === 'all'} onOpen={open} locked={!!view || about} intro={intro} />
         </section>
       </main>
 
       {aboutOn && <About active={about} rootRef={aboutRef} />}
 
       {/* Outside the page so it survives every view. */}
-      <header className={view ? 'bar is-project' : about ? 'bar is-about' : 'bar'}>
+      <header className={view ? `bar is-project${flowPage ? ' is-flow' : ''}` : about ? 'bar is-about' : 'bar'}>
         {/* Not just hidden: gone while a project is open, so it can never linger. */}
-        {!bioGone && <p className={bioAway ? 'role is-leaving' : 'role'}>{marked(site.bio)}</p>}
-        <nav className="nav" aria-label="Principal">
-          {site.nav.map((l) => (
+        {!bioGone && <p className={bioAway ? 'role is-leaving' : 'role'}>{marked(s.bio)}</p>}
+        <nav className="nav" aria-label={t.main}>
+          {s.nav.map((l) => (
             <a
               key={l.label}
               href={l.href}
@@ -229,7 +278,7 @@ function Site() {
             </a>
           ))}
         </nav>
-        {!(bioGone && view) && <Clock leaving={!!view} />}
+        {!(bioGone && view) && <Corner leaving={!!view} />}
       </header>
 
       {/* One instance for as long as a project is open: project to project it
@@ -240,6 +289,8 @@ function Site() {
           from={view.from}
           closing={closing}
           onClosed={onClosed}
+          order={order.map((p) => p.i)}
+          lens={filter === 'all' ? null : filter}
           onNext={next}
           onBack={() => close()}
         />

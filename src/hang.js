@@ -9,13 +9,19 @@
 // The About text doesn't fall: it rides a progress value that runs at constant
 // speed toward its target. onFrame(p, resting): resting once every body stopped.
 
-const TEXT = 0.8 // s, progress 0 → 1 for the About text
+const TEXT = 1.1 // s, progress 0 → 1 for the About text
+// One thing after the other, with a breath between: going to About the pieces
+// fall first and the text starts once they're down; coming back the text
+// leaves completely before the pieces rise into its place.
+const TEXT_AFTER = 0.55 // s after the fall starts, the About text starts
+const BREATH = 0.14 // s of stillness between the text gone and the rise
+const TEXT_OUT = TEXT * 0.5 // the last About line is gone at p = 0.5
 const G = 5200 // px/s²
 const HOP = 210 // px/s upward when a piece lets go
 const K = 95 // spring back onto the hook
 const C = 2 * Math.sqrt(K) * 0.68 // under-damped: one soft overshoot
-const STEP = 0.045 // s between pieces of one wave
-const WAVE = 0.075 // s between the two waves
+const STEP = 0.06 // s between pieces of one wave
+const WAVE = 0.1 // s between the two waves
 
 // Same small variation every time for the same slot, in (-amp, amp).
 const jitter = (k, amp) => ((Math.sin(k * 12.9898 + 4.1) * 43758.5453) % 1) * amp
@@ -37,7 +43,7 @@ export function createHang(onFrame) {
     const inView = (r) => r.right > 0 && r.left < innerWidth
     const cards = [...document.querySelectorAll('.card-hang')].map((el) => ({ el, r: el.getBoundingClientRect() }))
     const seen = cards.filter((c) => inView(c.r)).sort((a, b) => a.r.left - b.r.left)
-    const list = [document.querySelector('.hero'), ...seen.map((c) => c.el), document.querySelector('.now')].filter(Boolean)
+    const list = [document.querySelector('.hero'), ...seen.map((c) => c.el), document.querySelector('.filter'), document.querySelector('.now')].filter(Boolean)
     const piece = (el, k) => ({
       el,
       y: 0,
@@ -58,7 +64,7 @@ export function createHang(onFrame) {
   // Advances one body; true while it still moves.
   const move = (q, dt) => {
     const out = target === 1
-    const due = clock >= (out ? q.delay : order - q.delay)
+    const due = clock >= (out ? q.delay : TEXT_OUT + BREATH + order - q.delay)
     if (out && due && !q.free) (q.free = true), (q.vy = -HOP)
     if (!out && due) q.free = false
 
@@ -94,7 +100,8 @@ export function createHang(onFrame) {
     const dt = Math.min((now - last) / 1000, 1 / 30)
     last = now
     clock += dt
-    p = target > p ? Math.min(target, p + dt / TEXT) : Math.max(target, p - dt / TEXT)
+    const textGo = target === 1 && !reduce ? clock >= TEXT_AFTER : true
+    if (textGo) p = target > p ? Math.min(target, p + dt / TEXT) : Math.max(target, p - dt / TEXT)
     let moving = false
     if (!reduce) for (const q of pieces) moving = move(q, dt) || moving
     const resting = !moving && p === target
