@@ -1747,9 +1747,9 @@ html.returning .lang {
   }
   /* One reading size on a phone, as one on a desktop, and a generous one:
      the problem, every name, every note, the site's address and the facts
-     all at 20px (--read). */
+     all at 19px (--read). */
   .pr.is-flow {
-    --read: 20px;
+    --read: 19px;
     --read-lh: 1.35;
     --read-ls: -0.015em;
   }
